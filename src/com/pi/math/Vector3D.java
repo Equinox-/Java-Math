@@ -155,4 +155,10 @@ public class Vector3D {
 	public float mag2() {
 		return (x * x) + (y * y) + (z * z);
 	}
+
+	public static Vector3D linearCombination(float aC, Vector3D a, float bC,
+			Vector3D b) {
+		return new Vector3D(aC * a.x + bC * b.x, aC * a.y + bC * b.y, aC * a.z
+				+ bC * b.z);
+	}
 }
