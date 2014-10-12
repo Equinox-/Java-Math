@@ -1,5 +1,7 @@
 package com.pi.math;
 
+import java.nio.FloatBuffer;
+
 import com.pi.math.vector.Vector3D;
 
 public class TransMatrix extends Matrix {
@@ -319,5 +321,13 @@ public class TransMatrix extends Matrix {
 		TransMatrix m = adjugate();
 		m.multiply(1f / determinant());
 		return m;
+	}
+
+	public void load(FloatBuffer buff) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				data[j][i] = buff.get();
+			}
+		}
 	}
 }
