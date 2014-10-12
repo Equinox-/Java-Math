@@ -1,6 +1,6 @@
-package com.pi.math;
+package com.pi.math.vector;
 
-public class Vector3D {
+public class Vector3D extends Vector<Vector3D> {
 	public float x, y, z;
 
 	public Vector3D(float x, float y, float z) {
@@ -20,6 +20,7 @@ public class Vector3D {
 		return this;
 	}
 
+	@Override
 	public Vector3D subtract(Vector3D p) {
 		this.x -= p.x;
 		this.y -= p.y;
@@ -27,6 +28,7 @@ public class Vector3D {
 		return this;
 	}
 
+	@Override
 	public Vector3D add(Vector3D p) {
 		this.x += p.x;
 		this.y += p.y;
@@ -34,6 +36,7 @@ public class Vector3D {
 		return this;
 	}
 
+	@Override
 	public Vector3D multiply(float scalar) {
 		this.x *= scalar;
 		this.y *= scalar;
@@ -41,15 +44,18 @@ public class Vector3D {
 		return this;
 	}
 
+	@Override
 	public float distSquared(Vector3D p) {
 		float dX = p.x - x, dY = p.y - y, dZ = p.z - z;
 		return (dX * dX) + (dY * dY) + (dZ * dZ);
 	}
 
+	@Override
 	public float dist(Vector3D p) {
 		return (float) Math.sqrt(distSquared(p));
 	}
 
+	@Override
 	public float magnitude() {
 		return (float) Math.sqrt((x * x) + (y * y) + (z * z));
 	}
@@ -83,6 +89,7 @@ public class Vector3D {
 		return translate(trans.x, trans.y, trans.z);
 	}
 
+	@Override
 	public Vector3D normalize() {
 		float dist = dist(new Vector3D(0, 0, 0));
 		if (dist != 0) {
@@ -95,10 +102,6 @@ public class Vector3D {
 
 	public static Vector3D normalize(Vector3D p) {
 		return p.clone().normalize();
-	}
-
-	public static float dotProduct(Vector3D u, Vector3D v) {
-		return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
 	}
 
 	public static Vector3D crossProduct(Vector3D u, Vector3D v) {
@@ -152,13 +155,37 @@ public class Vector3D {
 		return this;
 	}
 
+	@Override
 	public float mag2() {
 		return (x * x) + (y * y) + (z * z);
 	}
 
-	public static Vector3D linearCombination(float aC, Vector3D a, float bC,
-			Vector3D b) {
-		return new Vector3D(aC * a.x + bC * b.x, aC * a.y + bC * b.y, aC * a.z
-				+ bC * b.z);
+	public static float dotProduct(Vector3D u, Vector3D v) {
+		return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
+	}
+
+	@Override
+	public float get(int d) {
+		switch (d) {
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		default:
+			return -1;
+		}
+	}
+
+	@Override
+	public float dot(Vector3D v) {
+		return dotProduct(this, v);
+	}
+
+	@Override
+	public Vector3D linearComb(float aC, Vector3D b, float bC) {
+		return new Vector3D(aC * x + bC * b.x, aC * y + bC * b.y, aC * z + bC
+				* b.z);
 	}
 }

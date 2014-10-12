@@ -1,5 +1,7 @@
 package com.pi.math;
 
+import com.pi.math.vector.Vector3D;
+
 public class TransMatrix extends Matrix {
 	public TransMatrix() {
 		super(4, 4);

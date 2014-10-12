@@ -1,5 +1,7 @@
 package com.pi.math;
 
+import com.pi.math.vector.Vector3D;
+
 public class MathUtil {
 	/**
 	 * [distance from segment, distance on line, distance on infinite line,

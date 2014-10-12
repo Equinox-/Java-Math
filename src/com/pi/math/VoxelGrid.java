@@ -1,5 +1,7 @@
 package com.pi.math;
 
+import com.pi.math.vector.Vector3D;
+
 public class VoxelGrid<T> {
 	private float gridSize;
 	private Object[][][] dataArray;

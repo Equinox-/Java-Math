@@ -1,5 +1,7 @@
 package com.pi.math;
 
+import com.pi.math.vector.Vector3D;
+
 public class Quaternion {
 	private static final double DELTA = 1e-10;
 	public float w, x, y, z;
