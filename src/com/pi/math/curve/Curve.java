@@ -2,8 +2,7 @@ package com.pi.math.curve;
 
 import com.pi.math.vector.Vector;
 
-@SuppressWarnings("rawtypes")
-public interface Curve<T extends Vector> {
+public interface Curve {
 	/**
 	 * Gets the vector located at time <em>t</em> in this line, where t=0 for
 	 * the first point and t=1 for the last point.
@@ -12,5 +11,5 @@ public interface Curve<T extends Vector> {
 	 *            The curve time, [0,1]
 	 * @return The position
 	 */
-	public T calculate(float t);
+	public Vector calculate(float t);
 }

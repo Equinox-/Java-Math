@@ -1,6 +1,6 @@
 package com.pi.math.vector;
 
-public class Vector3D extends Vector<Vector3D> {
+public class Vector3D extends Vector {
 	public float x, y, z;
 
 	public Vector3D(float x, float y, float z) {
@@ -13,27 +13,39 @@ public class Vector3D extends Vector<Vector3D> {
 		this(0, 0, 0);
 	}
 
-	public Vector3D translate(float x, float y, float z) {
-		this.x += x;
-		this.y += y;
-		this.z += z;
-		return this;
+	@Override
+	public float get(int d) {
+		switch (d) {
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+		default:
+			return -1;
+		}
 	}
 
 	@Override
-	public Vector3D subtract(Vector3D p) {
-		this.x -= p.x;
-		this.y -= p.y;
-		this.z -= p.z;
-		return this;
+	public void set(int d, float r) {
+		switch (d) {
+		case 0:
+			x = r;
+			return;
+		case 1:
+			y = r;
+			return;
+		case 2:
+			z = r;
+			return;
+		default:
+		}
 	}
 
 	@Override
-	public Vector3D add(Vector3D p) {
-		this.x += p.x;
-		this.y += p.y;
-		this.z += p.z;
-		return this;
+	public int dimension() {
+		return 3;
 	}
 
 	@Override
@@ -42,22 +54,6 @@ public class Vector3D extends Vector<Vector3D> {
 		this.y *= scalar;
 		this.z *= scalar;
 		return this;
-	}
-
-	@Override
-	public float distSquared(Vector3D p) {
-		float dX = p.x - x, dY = p.y - y, dZ = p.z - z;
-		return (dX * dX) + (dY * dY) + (dZ * dZ);
-	}
-
-	@Override
-	public float dist(Vector3D p) {
-		return (float) Math.sqrt(distSquared(p));
-	}
-
-	@Override
-	public float magnitude() {
-		return (float) Math.sqrt((x * x) + (y * y) + (z * z));
 	}
 
 	@Override
@@ -85,107 +81,14 @@ public class Vector3D extends Vector<Vector3D> {
 		return "(" + x + "," + y + "," + z + ")";
 	}
 
-	public Vector3D translate(Vector3D trans) {
-		return translate(trans.x, trans.y, trans.z);
-	}
-
-	@Override
-	public Vector3D normalize() {
-		float dist = dist(new Vector3D(0, 0, 0));
-		if (dist != 0) {
-			x /= dist;
-			y /= dist;
-			z /= dist;
-		}
-		return this;
-	}
-
-	public static Vector3D normalize(Vector3D p) {
-		return p.clone().normalize();
-	}
-
-	public static Vector3D crossProduct(Vector3D u, Vector3D v) {
-		return new Vector3D((u.y * v.z) - (u.z * v.y), (u.z * v.x)
-				- (u.x * v.z), (u.x * v.y) - (u.y * v.x));
-	}
-
-	public static Vector3D negative(Vector3D p) {
-		return new Vector3D(-p.x, -p.y, -p.z);
-	}
-
-	public static Vector3D projectOntoPlane(Vector3D planeNormal,
-			Vector3D vector) {
-		return vector.clone().subtract(
-				planeNormal.clone().multiply(
-						Vector3D.dotProduct(vector, planeNormal)));
-	}
-
-	/**
-	 * Spherical linear interpolation from a to b, at time t in [0, 1]
-	 */
-	public static Vector3D slerp(Vector3D a, Vector3D b, float t) {
-		float angle = (float) Math.acos(dotProduct(a.clone(), b.clone()));
-		float weightA = (float) (Math.sin((1 - t) * angle) / Math.sin(angle));
-		float weightB = (float) (Math.sin(t * angle) / Math.sin(angle));
-		return a.clone().multiply(weightA).add(b.clone().multiply(weightB));
-	}
-
-	public Vector3D reverse() {
-		x = -x;
-		y = -y;
-		z = -z;
-		return this;
-	}
-
-	public Vector3D abs() {
-		x = Math.abs(x);
-		y = Math.abs(y);
-		z = Math.abs(z);
-		return this;
-	}
-
 	public void set(float i, float j, float k) {
 		this.x = i;
 		this.y = j;
 		this.z = k;
 	}
 
-	public Vector3D set(Vector3D v) {
-		set(v.x, v.y, v.z);
-		return this;
-	}
-
 	@Override
 	public float mag2() {
 		return (x * x) + (y * y) + (z * z);
-	}
-
-	public static float dotProduct(Vector3D u, Vector3D v) {
-		return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
-	}
-
-	@Override
-	public float get(int d) {
-		switch (d) {
-		case 0:
-			return x;
-		case 1:
-			return y;
-		case 2:
-			return z;
-		default:
-			return -1;
-		}
-	}
-
-	@Override
-	public float dot(Vector3D v) {
-		return dotProduct(this, v);
-	}
-
-	@Override
-	public Vector3D linearComb(float aC, Vector3D b, float bC) {
-		return new Vector3D(aC * x + bC * b.x, aC * y + bC * b.y, aC * z + bC
-				* b.z);
 	}
 }

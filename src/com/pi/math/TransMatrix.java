@@ -2,6 +2,7 @@ package com.pi.math;
 
 import java.nio.FloatBuffer;
 
+import com.pi.math.vector.Vector;
 import com.pi.math.vector.Vector3D;
 
 public class TransMatrix extends Matrix {
@@ -116,19 +117,19 @@ public class TransMatrix extends Matrix {
 		return setRotation(0, 0, 1, radians);
 	}
 
-	public Vector3D multiply(Vector3D v) {
-		float resX = get(0, 3) + (v.x * get(0, 0)) + (v.y * get(0, 1))
-				+ (v.z * get(0, 2));
-		float resY = get(1, 3) + (v.x * get(1, 0)) + (v.y * get(1, 1))
-				+ (v.z * get(1, 2));
-		float resZ = get(2, 3) + (v.x * get(2, 0)) + (v.y * get(2, 1))
-				+ (v.z * get(2, 2));
+	public Vector3D multiply(Vector v) {
+		float resX = get(0, 3) + (v.get(0) * get(0, 0))
+				+ (v.get(1) * get(0, 1)) + (v.get(2) * get(0, 2));
+		float resY = get(1, 3) + (v.get(0) * get(1, 0))
+				+ (v.get(1) * get(1, 1)) + (v.get(2) * get(1, 2));
+		float resZ = get(2, 3) + (v.get(0) * get(2, 0))
+				+ (v.get(1) * get(2, 1)) + (v.get(2) * get(2, 2));
 		return new Vector3D(resX, resY, resZ);
 	}
 
 	public TransMatrix setForwardSystemTranslation(Vector3D origin,
 			Vector3D xVec, Vector3D yVec, Vector3D zVec) {
-		Vector3D nLoc = origin.clone().reverse();
+		Vector3D nLoc = origin.clone().multiply(-1);
 		set(0, 0, xVec.x);
 		set(1, 0, xVec.y);
 		set(2, 0, xVec.z);

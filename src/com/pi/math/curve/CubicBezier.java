@@ -1,12 +1,11 @@
 package com.pi.math.curve;
 
 import com.pi.math.vector.Vector;
-import com.pi.math.vector.Vector3D;
 
-public class CubicBezier<T extends Vector<T>> implements Curve<T> {
-	private final T a, b, c, d;
+public class CubicBezier implements Curve {
+	private final Vector a, b, c, d;
 
-	public CubicBezier(T a, T b, T c, T d) {
+	public CubicBezier(Vector a, Vector b, Vector c, Vector d) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
@@ -14,7 +13,7 @@ public class CubicBezier<T extends Vector<T>> implements Curve<T> {
 	}
 
 	@Override
-	public T calculate(float t1) {
+	public Vector calculate(float t1) {
 		final float t2 = t1 * t1;
 		final float t3 = t2 * t1;
 		final float mt1 = 1 - t1;
