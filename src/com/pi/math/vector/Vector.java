@@ -67,6 +67,14 @@ public abstract class Vector {
 		return r;
 	}
 
+	public Vector set(float... components) {
+		if (components.length != dimension())
+			throw new RuntimeException("Mismatched dimensions.");
+		for (int i = 0; i < components.length; i++)
+			set(i, components[i]);
+		return this;
+	}
+
 	public Vector set(Vector t) {
 		for (int i = 0; i < dimension(); i++) {
 			set(i, t.get(i));
