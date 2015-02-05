@@ -1,11 +1,11 @@
-package com.pi.math;
+package com.pi.math.matrix;
 
 import java.util.Arrays;
 
-public class Matrix {
+public class MatrixND {
 	protected float[][] data;
 
-	public Matrix(int rows, int cols) {
+	public MatrixND(int rows, int cols) {
 		data = new float[rows][cols];
 	}
 
@@ -35,8 +35,8 @@ public class Matrix {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof Matrix) {
-			Matrix m = (Matrix) o;
+		if (o instanceof MatrixND) {
+			MatrixND m = (MatrixND) o;
 			if (m.getRows() == getRows() && m.getCols() == getCols()) {
 				return Arrays.deepEquals(m.data, data);
 			}
@@ -46,7 +46,7 @@ public class Matrix {
 
 	@Override
 	public Object clone() {
-		Matrix mat = new Matrix(data.length, data[0].length);
+		MatrixND mat = new MatrixND(data.length, data[0].length);
 		for (int i = 0; i < data.length; i++) {
 			System.arraycopy(data[i], 0, mat.data[i], 0, data[i].length);
 		}
@@ -107,7 +107,7 @@ public class Matrix {
 		multiply(1 / scalar);
 	}
 
-	public Matrix add(Matrix m) {
+	public MatrixND add(MatrixND m) {
 		if (m.getRows() != getRows() || m.getCols() != getCols())
 			throw new ArrayIndexOutOfBoundsException("Matrix size mismatch!");
 		for (int x = 0; x < getRows(); x++) {
@@ -118,7 +118,7 @@ public class Matrix {
 		return this;
 	}
 
-	public Matrix subtract(Matrix m) {
+	public MatrixND subtract(MatrixND m) {
 		if (m.getRows() != getRows() || m.getCols() != getCols())
 			throw new ArrayIndexOutOfBoundsException("Matrix size mismatch!");
 		for (int x = 0; x < getRows(); x++) {
@@ -129,16 +129,16 @@ public class Matrix {
 		return this;
 	}
 
-	public static Matrix add(Matrix a, Matrix b) {
-		return ((Matrix) a.clone()).add(b);
+	public static MatrixND add(MatrixND a, MatrixND b) {
+		return ((MatrixND) a.clone()).add(b);
 	}
 
-	public static Matrix subtract(Matrix a, Matrix b) {
-		return ((Matrix) a.clone()).subtract(b);
+	public static MatrixND subtract(MatrixND a, MatrixND b) {
+		return ((MatrixND) a.clone()).subtract(b);
 	}
 
-	public Matrix transpose() {
-		Matrix mat = new Matrix(getCols(), getRows());
+	public MatrixND transpose() {
+		MatrixND mat = new MatrixND(getCols(), getRows());
 		for (int x = 0; x < getRows(); x++) {
 			for (int y = 0; y < getCols(); y++) {
 				mat.data[y][x] = data[x][y];
@@ -147,18 +147,18 @@ public class Matrix {
 		return mat;
 	}
 
-	public static Matrix createIdentityMatrix(int size) {
-		Matrix mat = new Matrix(size, size);
+	public static MatrixND createIdentityMatrix(int size) {
+		MatrixND mat = new MatrixND(size, size);
 		for (int i = 0; i < size; i++) {
 			mat.data[i][i] = 1;
 		}
 		return mat;
 	}
 
-	public static Matrix multiply(Matrix a, Matrix b) {
+	public static MatrixND multiply(MatrixND a, MatrixND b) {
 		if (a.getRows() != b.getCols())
 			throw new ArrayIndexOutOfBoundsException("Matrix size mismatch!");
-		Matrix result = new Matrix(a.getRows(), b.getCols());
+		MatrixND result = new MatrixND(a.getRows(), b.getCols());
 		for (int r = 0; r < result.getRows(); r++) {
 			for (int c = 0; c < result.getCols(); c++) {
 				for (int i = 0; i < a.getCols(); i++) {

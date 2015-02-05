@@ -1,6 +1,6 @@
 package com.pi.math;
 
-import com.pi.math.vector.Vector3D;
+import com.pi.math.vector.Vector;
 
 public class Quaternion {
 	private static final double DELTA = 1e-10;
@@ -9,7 +9,7 @@ public class Quaternion {
 	public Quaternion() {
 		this(1, 0, 0, 0);
 	}
-	
+
 	public Quaternion(float w, float x, float y, float z) {
 		setRaw(w, x, y, z);
 	}
@@ -152,7 +152,10 @@ public class Quaternion {
 		return this;
 	}
 
-	public void setRaw(float w, Vector3D v) {
-		setRaw(w, v.x, v.y, v.z);
+	public void setRaw(float w, Vector v) {
+		if (v.dimension() != 3)
+			throw new RuntimeException(
+					"Can only build quaternion from vector-3");
+		setRaw(w, v.get(0), v.get(1), v.get(2));
 	}
 }

@@ -110,11 +110,11 @@ public abstract class Vector {
 		return u.dot(v);
 	}
 
-	public static Vector3D crossProduct(Vector u, Vector v) {
+	public static Vector crossProduct(Vector u, Vector v) {
 		if (u.dimension() != 3 || v.dimension() != 3)
 			throw new IllegalArgumentException(
 					"Cross product is only valid in three dimensions");
-		return new Vector3D((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
+		return new VectorND((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
 				(u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
 	}
