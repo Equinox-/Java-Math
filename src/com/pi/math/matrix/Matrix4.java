@@ -289,10 +289,16 @@ public class Matrix4 {
 		put(15, get(3) * x + get(7) * y + get(11) * z + get(15));
 		return this;
 	}
-	
+
 	public FloatBuffer getAccessor() {
+		int ops = data.position();
+		int ol = data.limit();
 		data.position(offset);
-		return data.slice();
+		data.limit(offset + 16);
+		FloatBuffer slice = data.slice();
+		data.limit(ol);
+		data.position(ops);
+		return slice;
 	}
 
 	// Stringification

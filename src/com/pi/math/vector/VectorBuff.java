@@ -3,23 +3,23 @@ package com.pi.math.vector;
 import java.nio.FloatBuffer;
 
 public class VectorBuff extends Vector {
-	private final FloatBuffer buffer;
-	private final int head, dimension;
+	private final FloatBuffer data;
+	private final int offset, dimension;
 
-	public VectorBuff(FloatBuffer buffer, int head, int dimension) {
-		this.buffer = buffer;
-		this.head = head;
+	public VectorBuff(FloatBuffer data, int offset, int dimension) {
+		this.data = data;
+		this.offset = offset;
 		this.dimension = dimension;
 	}
 
 	@Override
 	public float get(int d) {
-		return buffer.get(head + d);
+		return data.get(offset + d);
 	}
 
 	@Override
 	public void set(int d, float f) {
-		buffer.put(head + d, f);
+		data.put(offset + d, f);
 	}
 
 	@Override
@@ -30,10 +30,21 @@ public class VectorBuff extends Vector {
 	@Override
 	public Vector clone() {
 		float[] tmp = new float[dimension];
-		int pos = buffer.position();
-		buffer.position(head);
-		buffer.get(tmp);
-		buffer.position(pos);
+		int pos = data.position();
+		data.position(offset);
+		data.get(tmp);
+		data.position(pos);
 		return new VectorND(tmp);
+	}
+
+	public FloatBuffer getAccessor() {
+		int ops = data.position();
+		int ol = data.limit();
+		data.position(offset);
+		data.limit(offset + dimension);
+		FloatBuffer slice = data.slice();
+		data.limit(ol);
+		data.position(ops);
+		return slice;
 	}
 }
