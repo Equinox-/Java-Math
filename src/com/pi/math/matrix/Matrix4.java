@@ -211,16 +211,15 @@ public class Matrix4 {
 		return copyTo(new Matrix4());
 	}
 
-	public Matrix4 asMatrix3(Matrix4 mat) {
-		Matrix4 res = mat.copy();
-		res.put(3, 0);
-		res.put(7, 0);
-		res.put(11, 0);
-		res.put(12, 0);
-		res.put(13, 0);
-		res.put(14, 0);
-		res.put(15, 1);
-		return res;
+	public Matrix4 asMatrix3() {
+		put(3, 0);
+		put(7, 0);
+		put(11, 0);
+		put(12, 0);
+		put(13, 0);
+		put(14, 0);
+		put(15, 1);
+		return this;
 	}
 
 	public static Matrix4 identity() {
@@ -302,6 +301,7 @@ public class Matrix4 {
 	}
 
 	// Stringification
+	@Override
 	public String toString() {
 		StringBuilder res = new StringBuilder();
 		for (int i = 0; i < 4; i++) {
