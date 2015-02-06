@@ -8,8 +8,8 @@ import com.pi.math.Quaternion;
 import com.pi.math.vector.Vector;
 
 public class Matrix4 {
-	public final FloatBuffer data;
-	public final int offset;
+	private final FloatBuffer data;
+	private final int offset;
 
 	public Matrix4() {
 		this(BufferUtils.createFloatBuffer(16), 0);
@@ -25,19 +25,20 @@ public class Matrix4 {
 			this.put(i, 0);
 	}
 
-	public void makeIdentity() {
+	public Matrix4 makeIdentity() {
 		zero();
 		put(0, 1);
 		put(5, 1);
 		put(10, 1);
 		put(15, 1);
+		return this;
 	}
 
-	private final float get(int i) {
+	public final float get(int i) {
 		return data.get(i + offset);
 	}
 
-	private final void put(int i, float f) {
+	public final void put(int i, float f) {
 		data.put(i + offset, f);
 	}
 
@@ -53,7 +54,7 @@ public class Matrix4 {
 			this.put(i, this.get(i) + from.get(i) * f);
 	}
 
-	private static void multiplyInto(final Matrix4 dest, final Matrix4 a,
+	public static void multiplyInto(final Matrix4 dest, final Matrix4 a,
 			final Matrix4 b) {
 		for (int i = 0; i < 4; i++) {
 			final int j = i << 2;
@@ -200,11 +201,14 @@ public class Matrix4 {
 		return res;
 	}
 
-	public Matrix4 copy() {
-		Matrix4 res = new Matrix4();
+	public Matrix4 copyTo(Matrix4 res) {
 		for (int i = 0; i < 16; i++)
 			res.put(i, get(i));
 		return res;
+	}
+
+	public Matrix4 copy() {
+		return copyTo(new Matrix4());
 	}
 
 	public Matrix4 asMatrix3(Matrix4 mat) {
@@ -230,75 +234,65 @@ public class Matrix4 {
 
 	// Methods for creating special matrices
 	public Matrix4 setAxisAngle(final float angle, final Vector a) {
-		final float c = (float) Math.cos(angle);
-		final float s = (float) Math.sin(angle);
-		final float c1 = 1 - c;
-
 		if (a.dimension() != 3)
 			throw new RuntimeException(
 					"Rotation is only allowed around 3-D vectors");
+		return SpecialMatrix.axisAngle(this, angle, a.get(0), a.get(1),
+				a.get(2));
+	}
 
-		final float x = a.get(0);
-		final float y = a.get(1);
-		final float z = a.get(2);
+	public Matrix4 setAxisAngle(final float angle, final float x,
+			final float y, final float z) {
+		return SpecialMatrix.axisAngle(this, angle, x, y, z);
+	}
 
-		put(0, c + x * x * c1);
-		put(1, y * x * c1 + z * s);
-		put(2, z * x * c1 - y * s);
-		put(3, 0);
-
-		put(4, x * y * c1 - z * s);
-		put(5, c + y * y * c1);
-		put(6, z * y * c1 + x * s);
-		put(7, 0);
-
-		put(8, x * z * c1 + y * s);
-		put(9, y * z * c1 - x * s);
-		put(10, c + z * z * c1);
-		put(11, 0);
-
-		put(12, 0);
-		put(13, 0);
-		put(14, 0);
-		put(15, 1);
-		return this;
+	public Matrix4 setTranslation(final Vector a) {
+		if (a.dimension() > 3)
+			throw new RuntimeException(
+					"Translation is only allowed for vectors of dimension 3 or less");
+		return SpecialMatrix.translation(this,
+				a.dimension() > 0 ? a.get(0) : 0, a.dimension() > 1 ? a.get(1)
+						: 0, a.dimension() > 2 ? a.get(2) : 0);
 	}
 
 	public Matrix4 setTranslation(final float x, final float y, final float z) {
-		put(12, x);
-		put(13, y);
-		put(14, z);
-		return this;
+		return SpecialMatrix.translation(this, x, y, z);
 	}
 
-	public void setRotation(Quaternion q) {
-		float x2 = q.x + q.x;
-		float y2 = q.y + q.y;
-		float z2 = q.z + q.z;
+	public Matrix4 setQuaternion(Quaternion q) {
+		return SpecialMatrix.quaternion(this, q.w, q.x, q.y, q.z);
+	}
 
-		float wx = q.w * x2;
-		float wy = q.w * y2;
-		float wz = q.w * z2;
+	public Matrix4 setQuaternion(final float w, final float x, final float y,
+			final float z) {
+		return SpecialMatrix.quaternion(this, w, x, y, z);
+	}
 
-		float xx = q.x * x2;
-		float xy = q.x * y2;
-		float xz = q.x * z2;
+	public Matrix4 setPerspective(final float left, final float right,
+			final float bottom, final float top, final float near,
+			final float far) {
+		return SpecialMatrix.perspective(this, left, right, bottom, top, near,
+				far);
+	}
 
-		float yy = q.y * y2;
-		float yz = q.y * z2;
+	public Matrix4 setOrthographic(final float left, final float right,
+			final float bottom, final float top, final float near,
+			final float far) {
+		return SpecialMatrix.orthographic(this, left, right, bottom, top, near,
+				far);
+	}
 
-		float zz = q.z * z2;
-		put(0, 1 - (yy + zz));
-		put(4, xy - wz);
-		put(8, xz + wy);
-
-		put(1, xy + wz);
-		put(5, 1 - (xx + zz));
-		put(9, yz - wx);
-
-		put(2, xz - wy);
-		put(6, yz + wx);
-		put(10, 1 - (xx + yy));
+	public Matrix4 preMultiplyTransform(float x, float y, float z) {
+		put(12, get(0) * x + get(4) * y + get(8) * z + get(12));
+		put(13, get(1) * x + get(5) * y + get(9) * z + get(13));
+		put(14, get(2) * x + get(6) * y + get(10) * z + get(14));
+		put(15, get(3) * x + get(7) * y + get(11) * z + get(15));
+		return this;
+	}
+	
+	public FloatBuffer getAccessor() {
+		data.position(offset);
+		return data.slice();
 	}
 
 	// Stringification
