@@ -4,8 +4,7 @@ import com.pi.math.vector.Vector;
 
 public class MathUtil {
 	/**
-	 * [distance from segment, distance on line, distance on infinite line,
-	 * distance from infinite line]
+	 * [distance from segment, distance on line, distance on infinite line, distance from infinite line]
 	 */
 	public static float[] getRelationToLine(Vector point, Vector lineA,
 			Vector lineB) {

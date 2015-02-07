@@ -26,8 +26,8 @@ public class CatmullRom implements Curve {
 	 *            The second bias
 	 * @return A curve
 	 */
-	public static CubicBezier makeArch(Vector before,
-			Vector pt1, Vector pt2, Vector after) {
+	public static CubicBezier makeArch(Vector before, Vector pt1, Vector pt2,
+			Vector after) {
 		Vector b = pt1, c = pt2;
 		if (before != null) {
 			b = pt1.linearComb(1, pt2.linearComb(1, before, -1), 1f / 6f);

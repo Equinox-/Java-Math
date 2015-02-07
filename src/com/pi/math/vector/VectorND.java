@@ -28,7 +28,7 @@ public class VectorND extends Vector {
 	public VectorND clone() {
 		return new VectorND(Arrays.copyOf(v, v.length));
 	}
-	
+
 	@Override
 	public String toString() {
 		return Arrays.toString(v);
