@@ -99,9 +99,11 @@ public class Matrix4 {
 	}
 
 	// Matrix operations
-
 	public Matrix4 inverse() {
-		Matrix4 res = new Matrix4();
+		return invertInto(new Matrix4());
+	}
+
+	public Matrix4 invertInto(Matrix4 res) {
 		res.put(0, get(5) * get(10) * get(15) - get(5) * get(11) * get(14)
 				- get(9) * get(6) * get(15) + get(9) * get(7) * get(14)
 				+ get(13) * get(6) * get(11) - get(13) * get(7) * get(10));
@@ -179,6 +181,24 @@ public class Matrix4 {
 		return res;
 	}
 
+	private final void swap(int a, int b) {
+		float v = get(a);
+		put(a, get(b));
+		put(b, v);
+	}
+
+	public Matrix4 transposeInPlace() {
+		swap(1, 4);
+		swap(2, 8);
+		swap(3, 12);
+		
+		swap(6, 9);
+		swap(7, 13);
+		
+		swap(11, 14);
+		return this;
+	}
+
 	public static Matrix4 transpose(final Matrix4 mat) {
 		Matrix4 res = mat.copy();
 		res.put(1, mat.get(4));
@@ -211,7 +231,7 @@ public class Matrix4 {
 		return copyTo(new Matrix4());
 	}
 
-	public Matrix4 asMatrix3() {
+	public Matrix4 makeMatrix3() {
 		put(3, 0);
 		put(7, 0);
 		put(11, 0);
