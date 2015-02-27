@@ -191,10 +191,10 @@ public class Matrix4 {
 		swap(1, 4);
 		swap(2, 8);
 		swap(3, 12);
-		
+
 		swap(6, 9);
 		swap(7, 13);
-		
+
 		swap(11, 14);
 		return this;
 	}
@@ -252,6 +252,17 @@ public class Matrix4 {
 	}
 
 	// Methods for creating special matrices
+	public Matrix4 setScale(final Vector s) {
+		if (s.dimension() != 3)
+			throw new IllegalArgumentException(
+					"Scaling only allowed by 3D vectors.");
+		return setScale(s.get(0), s.get(1), s.get(2));
+	}
+
+	public Matrix4 setScale(float x, float y, float z) {
+		return SpecialMatrix.scale(this, x, y, z);
+	}
+
 	public Matrix4 setAxisAngle(final float angle, final Vector a) {
 		if (a.dimension() != 3)
 			throw new RuntimeException(

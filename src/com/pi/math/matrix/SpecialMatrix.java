@@ -29,6 +29,14 @@ final class SpecialMatrix {
 		return m;
 	}
 
+	public static Matrix4 scale(Matrix4 m, float x, float y, float z) {
+		m.makeIdentity();
+		m.put(0, x);
+		m.put(5, y);
+		m.put(10, z);
+		return m;
+	}
+
 	public static Matrix4 translation(final Matrix4 m, final float x,
 			final float y, final float z) {
 		m.put(12, x);
