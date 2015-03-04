@@ -37,6 +37,19 @@ public class VectorBuff extends Vector {
 		return new VectorND(tmp);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		b.append('[');
+		for (int i = 0; i < dimension; i++) {
+			if (i > 0)
+				b.append(", ");
+			b.append(get(i));
+		}
+		b.append(']');
+		return b.toString();
+	}
+
 	public FloatBuffer getAccessor() {
 		int ops = data.position();
 		int ol = data.limit();
