@@ -127,6 +127,28 @@ public abstract class Vector {
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Vector) {
+			Vector v = (Vector) o;
+			if (v.dimension() != dimension())
+				return false;
+			for (int k = 0; k < dimension(); k++)
+				if (v.get(k) != get(k))
+					return false;
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		int code = 7411;
+		for (int k=0; k<dimension(); k++)
+			code = (code << 2) ^ (Float.floatToIntBits(get(k)) * 899809343);
+		return code;
+	}
+
 	/**
 	 * Spherical linear interpolation from a to b, at time Vector in [0, 1]
 	 */

@@ -1,7 +1,6 @@
 package com.pi.math;
 
 import com.pi.math.vector.Vector;
-import com.pi.math.vector.VectorND;
 
 public class MathUtil {
 	private static final float EPSILON = .00001f;
@@ -34,7 +33,7 @@ public class MathUtil {
 		return origin.clone().linearComb(1, normal, distOnLine);
 	}
 
-	public static boolean rayIntersectsTriangle(Vector O, Vector D, Vector v0,
+	public static Vector rayIntersectsTriangle(Vector O, Vector D, Vector v0,
 			Vector v1, Vector v2) {
 		// Moller-Trumbore ray-triangle intersection algorithm
 		// http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
@@ -54,7 +53,7 @@ public class MathUtil {
 		det = e1.dot(P);
 		// NOT CULLING
 		if (det > -EPSILON && det < EPSILON)
-			return false;
+			return null;
 		inv_det = 1.f / det;
 
 		// calculate distance from V1 to ray origin
@@ -64,7 +63,7 @@ public class MathUtil {
 		u = T.dot(P) * inv_det;
 		// The intersection lies outside of the triangle
 		if (u < 0.f || u > 1.f)
-			return false;
+			return null;
 
 		// Prepare to test v parameter
 		Q = Vector.crossProduct(T, e1);
@@ -73,16 +72,16 @@ public class MathUtil {
 		v = D.dot(Q) * inv_det;
 		// The intersection lies outside of the triangle
 		if (v < 0.f || u + v > 1.f)
-			return false;
+			return null;
 
 		t = e2.dot(Q) * inv_det;
 
 		if (t > EPSILON) { // ray intersection
-			return true;
+			return O.clone().linearComb(1, D, t);
 		}
 
 		// No hit, no win
-		return false;
+		return null;
 	}
 
 	public static float getMinDistanceBetweenLines(Vector[] lineA,
