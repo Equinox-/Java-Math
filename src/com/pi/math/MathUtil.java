@@ -1,9 +1,10 @@
 package com.pi.math;
 
 import com.pi.math.vector.Vector;
+import com.pi.math.vector.VectorND;
 
 public class MathUtil {
-	private static final float EPSILON = .00001f;
+	public static final float EPSILON = .00001f;
 
 	/**
 	 * [distance from segment, distance on line, distance on infinite line, distance from infinite line]
@@ -82,6 +83,60 @@ public class MathUtil {
 
 		// No hit, no win
 		return null;
+	}
+
+	public static boolean rayIntersectsSphere(Vector O, Vector D,
+			Vector center, float radius) {
+		Vector oMC = O.clone().subtract(center);
+		float b = D.dot(oMC);
+		float c = D.mag2() * (oMC.mag2() - radius * radius);
+		return Math.abs(b * b - c) < MathUtil.EPSILON;
+	}
+
+	public static boolean rayIntersectsBox(Vector O, Vector D, Vector min,
+			Vector max) {
+		boolean inside = true;
+		Vector maxT = min.clone();
+		for (int i = 0; i < maxT.dimension(); i++)
+			maxT.set(i, -1);
+
+		// Find candidate planes.
+		for (int i = 0; i < 3; i++) {
+			if (O.get(i) < min.get(i)) {
+				inside = false;
+				if (Math.abs(D.get(i)) > EPSILON)
+					maxT.set(i, (min.get(i) - O.get(i)) / D.get(i));
+			} else if (O.get(i) > max.get(i)) {
+				inside = false;
+				if (Math.abs(D.get(i)) > EPSILON)
+					maxT.set(i, (max.get(i) - O.get(i)) / D.get(i));
+			}
+		}
+
+		// Ray origin inside bounding box
+		if (inside) {
+			return true;
+		}
+
+		// Get largest of the maxT's for final choice of intersection
+		int plane = 0;
+		if (maxT.get(1) > maxT.get(plane))
+			plane = 1;
+		if (maxT.get(2) > maxT.get(plane))
+			plane = 2;
+
+		// Check final candidate actually inside box
+		if (maxT.get(plane) < 0)
+			return false;
+
+		for (int i = 0; i < 3; i++) {
+			if (i != plane) {
+				float cd = O.get(i) + maxT.get(plane) * D.get(i);
+				if (cd < min.get(i) - EPSILON || cd > max.get(i) + EPSILON)
+					return false;
+			}
+		}
+		return true; // ray hits box
 	}
 
 	public static float getMinDistanceBetweenLines(Vector[] lineA,
