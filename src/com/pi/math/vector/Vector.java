@@ -96,7 +96,10 @@ public abstract class Vector {
 	}
 
 	public Vector linearComb(float aC, Vector b, float bC) {
-		return this.clone().multiply(aC).add(b.clone().multiply(bC));
+		check(b);
+		for (int i = 0; i < dimension(); i++)
+			set(i, get(i) * aC + b.get(i) * bC);
+		return this;
 	}
 
 	public static Vector projectOntoPlane(Vector planeNormal, Vector vector) {
@@ -140,11 +143,11 @@ public abstract class Vector {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int code = 7411;
-		for (int k=0; k<dimension(); k++)
+		for (int k = 0; k < dimension(); k++)
 			code = (code << 2) ^ (Float.floatToIntBits(get(k)) * 899809343);
 		return code;
 	}

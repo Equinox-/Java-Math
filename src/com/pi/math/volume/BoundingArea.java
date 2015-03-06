@@ -68,7 +68,7 @@ public class BoundingArea {
 				max.set(i, v.get(i));
 		}
 		center.set(min);
-		center.linearComb(-.5f, max, .5f);
+		center.linearComb(.5f, max, .5f);
 		radius = center.dist(min);
 	}
 
