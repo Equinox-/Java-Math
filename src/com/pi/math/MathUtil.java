@@ -90,7 +90,7 @@ public class MathUtil {
 		Vector oMC = O.clone().subtract(center);
 		float b = D.dot(oMC);
 		float c = D.mag2() * (oMC.mag2() - radius * radius);
-		return Math.abs(b * b - c) < MathUtil.EPSILON;
+		return Math.abs(b * b - c) > -MathUtil.EPSILON;
 	}
 
 	public static boolean rayIntersectsBox(Vector O, Vector D, Vector min,
