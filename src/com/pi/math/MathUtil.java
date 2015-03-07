@@ -1,7 +1,6 @@
 package com.pi.math;
 
 import com.pi.math.vector.Vector;
-import com.pi.math.vector.VectorND;
 
 public class MathUtil {
 	public static final float EPSILON = .00001f;
