@@ -54,6 +54,13 @@ public class Matrix4 {
 			this.put(i, this.get(i) + from.get(i) * f);
 	}
 
+	/**
+	 * dest = a * b
+	 * 
+	 * @param dest
+	 * @param a
+	 * @param b
+	 */
 	public static void multiplyInto(final Matrix4 dest, final Matrix4 a,
 			final Matrix4 b) {
 		for (int i = 0; i < 4; i++) {
@@ -81,8 +88,14 @@ public class Matrix4 {
 		return res;
 	}
 
-	public void multiplyInto(Matrix4 b) {
+	/**
+	 * this = this * b
+	 * 
+	 * @param b
+	 */
+	public Matrix4 multiplyInto(Matrix4 b) {
 		multiplyInto(this, this, b);
+		return this;
 	}
 
 	public static Vector multiply(final Matrix4 a, final Vector v,
@@ -243,12 +256,7 @@ public class Matrix4 {
 	}
 
 	public static Matrix4 identity() {
-		Matrix4 res = new Matrix4();
-		res.put(0, 1);
-		res.put(5, 1);
-		res.put(10, 1);
-		res.put(15, 1);
-		return res;
+		return new Matrix4().makeIdentity();
 	}
 
 	// Methods for creating special matrices
@@ -289,13 +297,14 @@ public class Matrix4 {
 		return SpecialMatrix.translation(this, x, y, z);
 	}
 
-	public Matrix4 setQuaternion(Quaternion q) {
-		return SpecialMatrix.quaternion(this, q.w, q.x, q.y, q.z);
+	public Matrix4 setQuaternion(Vector q) {
+		return SpecialMatrix.quaternion(this, q.get(0), q.get(1), q.get(2),
+				q.get(3));
 	}
 
-	public Matrix4 setQuaternion(final float w, final float x, final float y,
-			final float z) {
-		return SpecialMatrix.quaternion(this, w, x, y, z);
+	public Matrix4 setQuaternion(final float x, final float y, final float z,
+			final float w) {
+		return SpecialMatrix.quaternion(this, x, y, z, w);
 	}
 
 	public Matrix4 setPerspective(final float left, final float right,

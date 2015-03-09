@@ -3,29 +3,16 @@ package com.pi.math;
 import com.pi.math.vector.Vector;
 
 public class Quaternion {
-	private static final double DELTA = 1e-10;
-	public float w, x, y, z;
-
-	public Quaternion() {
-		this(1, 0, 0, 0);
+	private static void checkDim(Vector f) {
+		if (f.dimension() != 4)
+			throw new IllegalArgumentException(
+					"Quaternion functions only work on 4D vectors");
 	}
 
-	public Quaternion(float w, float x, float y, float z) {
-		setRaw(w, x, y, z);
-	}
+	public static Vector setRotation(Vector f, float roll, float pitch,
+			float yaw) {
+		checkDim(f);
 
-	public Quaternion(float roll, float pitch, float yaw) {
-		setRotation(roll, pitch, yaw);
-	}
-
-	public void setRaw(float w, float x, float y, float z) {
-		this.w = w;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-
-	public Quaternion setRotation(float roll, float pitch, float yaw) {
 		float cr = (float) Math.cos(roll / 2);
 		float cp = (float) Math.cos(pitch / 2);
 		float cy = (float) Math.cos(yaw / 2);
@@ -39,123 +26,61 @@ public class Quaternion {
 		float cpsy = cp * sy;
 		float spcy = sp * cy;
 
-		w = cr * cpcy + sr * spsy;
-		x = sr * cpcy - cr * spsy;
-		y = cr * spcy + sr * cpsy;
-		z = cr * cpsy - sr * spcy;
-		return this;
+		f.setV(sr * cpcy - cr * spsy, cr * spcy + sr * cpsy, cr * cpsy - sr
+				* spcy, cr * cpcy + sr * spsy);
+		return f;
 	}
 
-	public void slerp(Quaternion to, float t) {
-		slerp(this, to, t);
-	}
-
-	public void slerp(Quaternion from, Quaternion to, float t) {
-		float[] to1 = new float[4];
+	public static Vector slerp(Vector dest, Vector from, Vector to, float t) {
+		checkDim(dest);
+		checkDim(from);
+		checkDim(to);
 		double omega, cosom, sinom;
-		double scale0, scale1;
+		float scale0, scale1;
 
 		// calc cosine
-		cosom = from.x * to.x + from.y * to.y + from.z * to.z + from.w * to.w;
-
-		// adjust signs (if necessary)
-		if (cosom < 0.0) {
-			cosom = -cosom;
-			to1[0] = -to.x;
-			to1[1] = -to.y;
-			to1[2] = -to.z;
-			to1[3] = -to.w;
-		} else {
-			to1[0] = to.x;
-			to1[1] = to.y;
-			to1[2] = to.z;
-			to1[3] = to.w;
-		}
+		cosom = from.dot(to);
 
 		// calculate coefficients
-		if ((1.0 - cosom) > DELTA) {
+		if ((1.0 - cosom) > MathUtil.EPSILON) {
 			// standard case (slerp)
 			omega = Math.acos(cosom);
 			sinom = Math.sin(omega);
-			scale0 = Math.sin((1.0 - t) * omega) / sinom;
-			scale1 = Math.sin(t * omega) / sinom;
+			scale0 = (float) (Math.sin((1.0 - t) * omega) / sinom);
+			scale1 = (float) (Math.sin(t * omega) / sinom);
 		} else {
 			// "from" and "to" quaternions are very close
 			// ... so we can do a linear interpolation
 			scale0 = 1.0f - t;
 			scale1 = t;
 		}
+		if (cosom < 0.0)
+			scale1 *= -1;
 
 		// calculate final values
-		x = (float) (scale0 * from.x + scale1 * to1[0]);
-		y = (float) (scale0 * from.y + scale1 * to1[1]);
-		z = (float) (scale0 * from.z + scale1 * to1[2]);
-		w = (float) (scale0 * from.w + scale1 * to1[3]);
+		return dest.set(from).linearComb(scale0, to, scale1);
 	}
 
-	public void lerp(Quaternion to, float t) {
-		lerp(this, to, t);
-	}
+	public static Vector multiply(Vector dest, Vector a, Vector by) {
+		checkDim(a);
+		checkDim(by);
 
-	public void lerp(Quaternion from, Quaternion to, float t) {
-		float[] to1 = new float[4];
-		float cosom;
-		float scale0, scale1;
-
-		// calc cosine
-		cosom = from.x * to.x + from.y * to.y + from.z * to.z + from.w * to.w;
-
-		// adjust signs (if necessary)
-		if (cosom < 0.0) {
-			to1[0] = -to.x;
-			to1[1] = -to.y;
-			to1[2] = -to.z;
-			to1[3] = -to.w;
-		} else {
-			to1[0] = to.x;
-			to1[1] = to.y;
-			to1[2] = to.z;
-			to1[3] = to.w;
-		}
-
-		// interpolate linearly
-		scale0 = 1.0f - t;
-		scale1 = t;
-
-		// calculate final values
-		x = scale0 * from.x + scale1 * to1[0];
-		y = scale0 * from.y + scale1 * to1[1];
-		z = scale0 * from.z + scale1 * to1[2];
-		w = scale0 * from.w + scale1 * to1[3];
-	}
-
-	@Override
-	public Quaternion clone() {
-		return new Quaternion(w, x, y, z);
-	}
-
-	public Quaternion multiply(Quaternion q) {
 		float E, F, G, H;
-		float tw = w;
-		float tx = x;
-		float ty = y;
+		float tw = a.get(3);
+		float tx = a.get(0);
+		float ty = a.get(1);
 
-		E = (tx + z) * (q.x + q.y);
-		F = (tx - z) * (q.x - q.y);
-		G = (tw + ty) * (q.w - q.z);
-		H = (tw - ty) * (q.w + q.z);
+		E = (tx + a.get(2)) * (by.get(0) + by.get(1));
+		F = (tx - a.get(2)) * (by.get(0) - by.get(1));
+		G = (tw + ty) * (by.get(3) - by.get(2));
+		H = (tw - ty) * (by.get(3) + by.get(2));
 
-		w = (z - ty) * (q.y - q.z) + (-E - F + G + H) / 2;
-		x = (tw + tx) * (q.w + q.x) - (E + F + G + H) / 2;
-		y = (tw - tx) * (q.y + q.z) + (E - F + G - H) / 2;
-		z = (ty + z) * (q.w - q.x) + (E - F - G + H) / 2;
-		return this;
-	}
-
-	public void setRaw(float w, Vector v) {
-		if (v.dimension() != 3)
-			throw new RuntimeException(
-					"Can only build quaternion from vector-3");
-		setRaw(w, v.get(0), v.get(1), v.get(2));
+		dest.setV(
+				(tw + tx) * (by.get(3) + by.get(0)) - (E + F + G + H) / 2,
+				(tw - tx) * (by.get(1) + by.get(2)) + (E - F + G - H) / 2,
+				(ty + a.get(2)) * (by.get(3) - by.get(0)) + (E - F - G + H) / 2,
+				(a.get(2) - ty) * (by.get(1) - by.get(2)) + (-E - F + G + H)
+						/ 2);
+		return dest;
 	}
 }

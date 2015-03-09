@@ -45,8 +45,9 @@ final class SpecialMatrix {
 		return m;
 	}
 
-	public static Matrix4 quaternion(final Matrix4 m, final float w,
-			final float x, final float y, final float z) {
+	public static Matrix4 quaternion(final Matrix4 m, final float x,
+			final float y, final float z, final float w) {
+		m.makeIdentity();
 		final float x2 = x * 2;
 		final float y2 = y * 2;
 		final float z2 = z * 2;
