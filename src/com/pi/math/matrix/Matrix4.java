@@ -1,23 +1,33 @@
 package com.pi.math.matrix;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
-import com.pi.math.Quaternion;
 import com.pi.math.vector.Vector;
 
 public class Matrix4 {
 	private final FloatBuffer data;
-	private final int offset;
 
 	public Matrix4() {
-		this(BufferUtils.createFloatBuffer(16), 0);
+		this.data = BufferUtils.createFloatBuffer(16);
+	}
+
+	public Matrix4(ByteBuffer f, int offset) {
+		int ops = f.position();
+		f.position(offset);
+		this.data = f.asFloatBuffer();
+		this.data.limit(16);
+		f.position(ops);
 	}
 
 	public Matrix4(FloatBuffer f, int offset) {
-		this.data = f;
-		this.offset = offset;
+		int ops = f.position();
+		f.position(offset);
+		this.data = f.slice();
+		this.data.limit(16);
+		f.position(ops);
 	}
 
 	public void zero() {
@@ -35,11 +45,11 @@ public class Matrix4 {
 	}
 
 	public final float get(int i) {
-		return data.get(i + offset);
+		return data.get(i);
 	}
 
 	public final void put(int i, float f) {
-		data.put(i + offset, f);
+		data.put(i, f);
 	}
 
 	// Math operations
@@ -55,7 +65,7 @@ public class Matrix4 {
 	}
 
 	/**
-	 * dest = a * b
+	 * dest = b * a
 	 * 
 	 * @param dest
 	 * @param a
@@ -89,7 +99,7 @@ public class Matrix4 {
 	}
 
 	/**
-	 * this = this * b
+	 * this = b * this
 	 * 
 	 * @param b
 	 */
@@ -302,9 +312,9 @@ public class Matrix4 {
 				q.get(3));
 	}
 
-	public Matrix4 setQuaternion(final float x, final float y, final float z,
-			final float w) {
-		return SpecialMatrix.quaternion(this, x, y, z, w);
+	public Matrix4 setQuaternion(final float q0, final float q1,
+			final float q2, final float q3) {
+		return SpecialMatrix.quaternion(this, q0, q1, q2, q3);
 	}
 
 	public Matrix4 setPerspective(final float left, final float right,
@@ -330,26 +340,25 @@ public class Matrix4 {
 	}
 
 	public FloatBuffer getAccessor() {
-		int ops = data.position();
-		int ol = data.limit();
-		data.position(offset);
-		data.limit(offset + 16);
-		FloatBuffer slice = data.slice();
-		data.limit(ol);
-		data.position(ops);
-		return slice;
+		return data;
 	}
 
 	// Stringification
-	@Override
-	public String toString() {
+
+	public static String toString(Matrix4... show) {
 		StringBuilder res = new StringBuilder();
 		for (int i = 0; i < 4; i++) {
 			if (i > 0)
 				res.append('\n');
-			res.append(get(i) + " " + get(i + 4) + " " + get(i + 8) + " "
-					+ get(i + 12));
+			for (Matrix4 m : show)
+				res.append(String.format("%+2.8f %+2.8f %+2.8f %+2.8f    ",
+						m.get(i), m.get(i + 4), m.get(i + 8), m.get(i + 12)));
 		}
 		return res.toString();
+	}
+
+	@Override
+	public String toString() {
+		return toString(this);
 	}
 }

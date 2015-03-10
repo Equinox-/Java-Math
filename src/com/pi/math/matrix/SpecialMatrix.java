@@ -39,42 +39,37 @@ final class SpecialMatrix {
 
 	public static Matrix4 translation(final Matrix4 m, final float x,
 			final float y, final float z) {
+		m.makeIdentity();
 		m.put(12, x);
 		m.put(13, y);
 		m.put(14, z);
 		return m;
 	}
 
-	public static Matrix4 quaternion(final Matrix4 m, final float x,
-			final float y, final float z, final float w) {
+	public static Matrix4 quaternion(final Matrix4 m, final float w,
+			final float x, final float y, final float z) {
+		float xx = x * x;
+		float xy = x * y;
+		float xz = x * z;
+		float yy = y * y;
+		float zz = z * z;
+		float yz = y * z;
+		float wx = w * x;
+		float wy = w * y;
+		float wz = w * z;
+
 		m.makeIdentity();
-		final float x2 = x * 2;
-		final float y2 = y * 2;
-		final float z2 = z * 2;
+		m.put(0, 1.0f - 2.0f * (yy + zz));
+		m.put(4, 2.0f * (xy - wz));
+		m.put(8, 2.0f * (xz + wy));
 
-		final float wx = w * x2;
-		final float wy = w * y2;
-		final float wz = w * z2;
+		m.put(1, 2.0f * (xy + wz));
+		m.put(5, 1.0f - 2.0f * (xx + zz));
+		m.put(9, 2.0f * (yz - wx));
 
-		final float xx = x * x2;
-		final float xy = x * y2;
-		final float xz = x * z2;
-
-		final float yy = y * y2;
-		final float yz = y * z2;
-		final float zz = z * z2;
-
-		m.put(0, 1 - (yy + zz));
-		m.put(4, xy - wz);
-		m.put(8, xz + wy);
-
-		m.put(1, xy + wz);
-		m.put(5, 1 - (xx + zz));
-		m.put(9, yz - wx);
-
-		m.put(2, xz - wy);
-		m.put(6, yz + wx);
-		m.put(10, 1 - (xx + yy));
+		m.put(2, 2.0f * (xz - wy));
+		m.put(6, 2.0f * (yz + wx));
+		m.put(10, 1.0f - 2.0f * (xx + yy));
 		return m;
 	}
 
