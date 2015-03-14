@@ -7,7 +7,7 @@ import org.lwjgl.BufferUtils;
 
 import com.pi.math.vector.Vector;
 
-public class Matrix4 {
+public final class Matrix4 {
 	private final FloatBuffer data;
 
 	public Matrix4() {
@@ -75,8 +75,8 @@ public class Matrix4 {
 			final Matrix4 b) {
 		for (int i = 0; i < 4; i++) {
 			final int j = i << 2;
-			final float ai0 = a.get(j), ai1 = a.get(j + 1), ai2 = a.data
-					.get(j + 2), ai3 = a.get(j + 3);
+			final float ai0 = a.get(j), ai1 = a.get(j + 1), ai2 = a.get(j + 2), ai3 = a
+					.get(j + 3);
 			dest.put(j,
 					ai0 * b.get(0) + ai1 * b.get(4 + 0) + ai2 * b.get(8 + 0)
 							+ ai3 * b.get(12 + 0));

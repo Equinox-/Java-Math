@@ -3,6 +3,8 @@ package com.pi.math.vector;
 import com.pi.math.FastMath;
 
 public abstract class Vector {
+	private static final boolean DIMENSION_CHECK = false;
+
 	public abstract float get(int d);
 
 	public abstract void set(int d, float r);
@@ -12,9 +14,11 @@ public abstract class Vector {
 	@Override
 	public abstract Vector clone();
 
-	void check(Vector t) {
-		if (dimension() != t.dimension())
-			throw new IllegalArgumentException("Mismatch Dimensions");
+	public final void check(Vector t) {
+		if (DIMENSION_CHECK) {
+			if (dimension() != t.dimension())
+				throw new IllegalArgumentException("Mismatch Dimensions");
+		}
 	}
 
 	public Vector add(Vector r) {
@@ -37,11 +41,11 @@ public abstract class Vector {
 		return this;
 	}
 
-	public float magnitude() {
+	public final float magnitude() {
 		return (float) Math.sqrt(mag2());
 	}
 
-	public float dist(Vector t) {
+	public final float dist(Vector t) {
 		return (float) Math.sqrt(distSquared(t));
 	}
 
@@ -68,9 +72,7 @@ public abstract class Vector {
 	}
 
 	public Vector setV(float... components) {
-		if (components.length != dimension())
-			throw new RuntimeException("Mismatched dimensions.");
-		for (int i = 0; i < components.length; i++)
+		for (int i = 0; i < Math.min(dimension(), components.length); i++)
 			set(i, components[i]);
 		return this;
 	}
@@ -90,7 +92,7 @@ public abstract class Vector {
 		return r;
 	}
 
-	public float angle(Vector v) {
+	public final float angle(Vector v) {
 		return (float) Math.acos(dot(v) * FastMath.Q_rsqrt(mag2())
 				* FastMath.Q_rsqrt(v.mag2()));
 	}
@@ -121,11 +123,25 @@ public abstract class Vector {
 		return u.dot(v);
 	}
 
+	public static Vector linearComb(Vector dest, Vector a, float aC, Vector b,
+			float bC) {
+		a.check(b);
+		a.check(dest);
+
+		for (int i = 0; i < a.dimension(); i++)
+			dest.set(i, a.get(i) * aC + b.get(i) * bC);
+		return dest;
+	}
+
 	public static Vector crossProduct(Vector u, Vector v) {
-		if (u.dimension() != 3 || v.dimension() != 3)
+		return crossProduct(new VectorND(new float[3]), u, v);
+	}
+
+	public static Vector crossProduct(Vector dest, Vector u, Vector v) {
+		if (u.dimension() != 3 || v.dimension() != 3 || dest.dimension() != 3)
 			throw new IllegalArgumentException(
 					"Cross product is only valid in three dimensions");
-		return new VectorND((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
+		return dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
 				(u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
 	}

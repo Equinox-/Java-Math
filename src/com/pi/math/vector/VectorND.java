@@ -2,8 +2,8 @@ package com.pi.math.vector;
 
 import java.util.Arrays;
 
-public class VectorND extends Vector {
-	private float[] v;
+public final class VectorND extends Vector {
+	private final float[] v;
 
 	public VectorND(float... values) {
 		this.v = values;
@@ -17,6 +17,12 @@ public class VectorND extends Vector {
 	@Override
 	public void set(int d, float f) {
 		v[d] = f;
+	}
+
+	@Override
+	public Vector setV(float... v) {
+		System.arraycopy(v, 0, this.v, 0, Math.min(this.v.length, v.length));
+		return this;
 	}
 
 	@Override
