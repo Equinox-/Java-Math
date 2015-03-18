@@ -12,7 +12,7 @@ public class FastMath {
 		i = 0x5f3759df - (i >> 1); // what the fuck?
 		y = Float.intBitsToFloat(i);
 		y = y * (threehalfs - (x2 * y * y)); // 1st iteration
-		// y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can
+		y = y * (threehalfs - (x2 * y * y)); // 2nd iteration, this can
 		// be removed
 
 		return y;
@@ -27,5 +27,19 @@ public class FastMath {
 		n |= n >> 16;
 		n++;
 		return n;
+	}
+
+	public static boolean isPowerOf2(int i) {
+		return (i > 0) && (i & (i - 1)) == 0;
+	}
+
+	public static int nextBit(int data, int start, int dir) {
+		final int sizeof = (1 << 4);
+		for (int k = 1; k < sizeof; k++) {
+			int bit = (start + k * dir + sizeof) & (sizeof - 1);
+			if ((data & (1 << bit)) != 0)
+				return bit;
+		}
+		return -1;
 	}
 }

@@ -80,11 +80,10 @@ public class Quaternion {
 	public static Vector slerp(Vector from, Vector to, float t) {
 		checkDim(from);
 		checkDim(to);
-
 		float cosTheta = from.dot(to);
 
 		if (cosTheta < 0.0f) {
-			Quaternion.conjugate(from);
+			from.multiply(-1);
 			cosTheta = -cosTheta;
 		}
 

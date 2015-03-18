@@ -1,6 +1,7 @@
 package com.pi.math.vector;
 
 import com.pi.math.FastMath;
+import com.pi.math.MathUtil;
 
 public abstract class Vector {
 	private static final boolean DIMENSION_CHECK = false;
@@ -153,7 +154,7 @@ public abstract class Vector {
 			if (v.dimension() != dimension())
 				return false;
 			for (int k = 0; k < dimension(); k++)
-				if (v.get(k) != get(k))
+				if (Math.abs(v.get(k)-get(k)) > MathUtil.EPSILON)
 					return false;
 			return true;
 		}
@@ -171,12 +172,14 @@ public abstract class Vector {
 	/**
 	 * Spherical linear interpolation from a to b, at time Vector in [0, 1]
 	 */
-	public static Vector slerp(Vector a, Vector b, float t) {
+	public static Vector slerp(Vector dest, Vector a, Vector b, float t) {
 		a.check(b);
+		a.check(dest);
+
 		final float angle = a.angle(b);
 		final float weightA = (float) (Math.sin((1 - t) * angle) / Math
 				.sin(angle));
 		final float weightB = (float) (Math.sin(t * angle) / Math.sin(angle));
-		return a.clone().multiply(weightA).add(b.clone().multiply(weightB));
+		return Vector.linearComb(dest, a, weightA, b, weightB);
 	}
 }

@@ -108,6 +108,21 @@ public final class Matrix4 {
 		return this;
 	}
 
+	public Vector transform4(Vector output, final Vector input) {
+		final float inW = input.dimension() < 4 ? 1 : input.get(3);
+		for (int k = 0; k < output.dimension(); k++)
+			output.set(k, get(k) * input.get(0) + get(4 + k) * input.get(1)
+					+ get(8 + k) * input.get(2) + get(12 + k) * inW);
+		return output;
+	}
+
+	public Vector transform3(Vector output, final Vector input) {
+		for (int k = 0; k < output.dimension(); k++)
+			output.set(k, get(k) * input.get(0) + get(4 + k) * input.get(1)
+					+ get(8 + k) * input.get(2));
+		return output;
+	}
+
 	public static Vector multiply(final Matrix4 a, final Vector v,
 			final Vector dest) {
 		final int cols = Math.min(4, v.dimension());
