@@ -293,43 +293,41 @@ public final class Matrix4 {
 	}
 
 	public Matrix4 setScale(float x, float y, float z) {
-		return SpecialMatrix.scale(this, x, y, z);
+		return SpecialMatrix.scale(this.makeIdentity(), x, y, z);
 	}
 
 	public Matrix4 setAxisAngle(final float angle, final Vector a) {
 		if (a.dimension() != 3)
 			throw new RuntimeException(
 					"Rotation is only allowed around 3-D vectors");
-		return SpecialMatrix.axisAngle(this, angle, a.get(0), a.get(1),
-				a.get(2));
+		return setAxisAngle(angle, a.get(0), a.get(1), a.get(2));
 	}
 
 	public Matrix4 setAxisAngle(final float angle, final float x,
 			final float y, final float z) {
-		return SpecialMatrix.axisAngle(this, angle, x, y, z);
+		return SpecialMatrix.axisAngle(this.makeIdentity(), angle, x, y, z);
 	}
 
 	public Matrix4 setTranslation(final Vector a) {
 		if (a.dimension() > 3)
 			throw new RuntimeException(
 					"Translation is only allowed for vectors of dimension 3 or less");
-		return SpecialMatrix.translation(this,
-				a.dimension() > 0 ? a.get(0) : 0, a.dimension() > 1 ? a.get(1)
-						: 0, a.dimension() > 2 ? a.get(2) : 0);
+		return setTranslation(a.dimension() > 0 ? a.get(0) : 0,
+				a.dimension() > 1 ? a.get(1) : 0, a.dimension() > 2 ? a.get(2)
+						: 0);
 	}
 
 	public Matrix4 setTranslation(final float x, final float y, final float z) {
-		return SpecialMatrix.translation(this, x, y, z);
+		return SpecialMatrix.translation(this.makeIdentity(), x, y, z);
 	}
 
 	public Matrix4 setQuaternion(Vector q) {
-		return SpecialMatrix.quaternion(this, q.get(0), q.get(1), q.get(2),
-				q.get(3));
+		return setQuaternion(q.get(0), q.get(1), q.get(2), q.get(3));
 	}
 
 	public Matrix4 setQuaternion(final float q0, final float q1,
 			final float q2, final float q3) {
-		return SpecialMatrix.quaternion(this, q0, q1, q2, q3);
+		return SpecialMatrix.quaternion(this.makeIdentity(), q0, q1, q2, q3);
 	}
 
 	public Matrix4 setPerspective(final float left, final float right,

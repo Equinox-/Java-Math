@@ -1,6 +1,6 @@
 package com.pi.math.matrix;
 
-final class SpecialMatrix {
+public final class SpecialMatrix {
 	public static Matrix4 axisAngle(final Matrix4 m, final float angle,
 			final float x, final float y, final float z) {
 		final float c = (float) Math.cos(angle);
@@ -30,7 +30,6 @@ final class SpecialMatrix {
 	}
 
 	public static Matrix4 scale(Matrix4 m, float x, float y, float z) {
-		m.makeIdentity();
 		m.put(0, x);
 		m.put(5, y);
 		m.put(10, z);
@@ -39,7 +38,6 @@ final class SpecialMatrix {
 
 	public static Matrix4 translation(final Matrix4 m, final float x,
 			final float y, final float z) {
-		m.makeIdentity();
 		m.put(12, x);
 		m.put(13, y);
 		m.put(14, z);
@@ -58,7 +56,6 @@ final class SpecialMatrix {
 		float wy = w * y;
 		float wz = w * z;
 
-		m.makeIdentity();
 		m.put(0, 1.0f - 2.0f * (yy + zz));
 		m.put(4, 2.0f * (xy - wz));
 		m.put(8, 2.0f * (xz + wy));

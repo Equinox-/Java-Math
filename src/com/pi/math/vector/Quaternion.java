@@ -28,13 +28,18 @@ public class Quaternion {
 
 	// Input: Roll, pitch, yaw
 	public static Vector fromEulerAngles(Vector quat, Vector src) {
-		checkDim(quat);
 		if (src.dimension() != 3)
 			throw new IllegalArgumentException(
 					"Can only compose a quaternion from a 3D vector.");
-		float r2 = src.get(0) / 2;
-		float p2 = src.get(1) / 2;
-		float y2 = src.get(2) / 2;
+		return fromEulerAngles(quat, src.get(0), src.get(1), src.get(2));
+	}
+
+	public static Vector fromEulerAngles(Vector quat, float roll, float pitch,
+			float yaw) {
+		checkDim(quat);
+		float r2 = roll / 2;
+		float p2 = pitch / 2;
+		float y2 = yaw / 2;
 		float cr2 = (float) Math.cos(r2);
 		float sr2 = (float) Math.sin(r2);
 		float cp2 = (float) Math.cos(p2);
@@ -44,8 +49,8 @@ public class Quaternion {
 
 		quat.set(0, cr2 * cp2 * cy2 + sr2 * sp2 * sy2);
 		quat.set(1, sr2 * cp2 * cy2 - cr2 * sp2 * sy2);
-		quat.set(1, cr2 * sp2 * cy2 + sr2 * cp2 * sy2);
-		quat.set(1, cr2 * cp2 * sy2 - sr2 * sp2 * cy2);
+		quat.set(2, cr2 * sp2 * cy2 + sr2 * cp2 * sy2);
+		quat.set(3, cr2 * cp2 * sy2 - sr2 * sp2 * cy2);
 		return quat.normalize();
 	}
 
