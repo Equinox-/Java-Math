@@ -127,9 +127,8 @@ public abstract class Vector {
 	public static Vector linearComb(Vector dest, Vector a, float aC, Vector b,
 			float bC) {
 		a.check(b);
-		a.check(dest);
 
-		for (int i = 0; i < a.dimension(); i++)
+		for (int i = 0; i < Math.min(a.dimension(), dest.dimension()); i++)
 			dest.set(i, a.get(i) * aC + b.get(i) * bC);
 		return dest;
 	}
@@ -154,7 +153,7 @@ public abstract class Vector {
 			if (v.dimension() != dimension())
 				return false;
 			for (int k = 0; k < dimension(); k++)
-				if (Math.abs(v.get(k)-get(k)) > MathUtil.EPSILON)
+				if (Math.abs(v.get(k) - get(k)) > MathUtil.EPSILON)
 					return false;
 			return true;
 		}
