@@ -1,56 +1,48 @@
 package com.pi.math.volume;
 
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
+
 import com.pi.math.MathUtil;
-import com.pi.math.vector.Vector;
-import com.pi.math.vector.VectorND;
+import com.pi.math.vector.VectorBuff;
+import com.pi.math.vector.VectorBuff3;
 
 public class BoundingArea {
-	private Vector min, max;
-	private Vector center;
+	private VectorBuff3 min, max;
+	private VectorBuff3 center;
 	private float radius;
 
-	public BoundingArea(Vector min, Vector max) {
-		this(min.dimension());
-		if (min.dimension() != max.dimension())
-			throw new IllegalArgumentException("Mismatch dimensions.");
+	public BoundingArea(VectorBuff3 min, VectorBuff3 max) {
+		this();
 		include(min);
 		include(max);
 	}
 
-	public BoundingArea(final int dim) {
-		final float[] low = new float[dim];
-		final float[] high = new float[dim];
-		for (int i = 0; i < dim; i++) {
-			low[i] = Float.MAX_VALUE;
-			high[i] = -Float.MAX_VALUE;
-		}
-		min = new VectorND(low);
-		max = new VectorND(high);
-		center = new VectorND(new float[dim]);
+	public BoundingArea() {
+		FloatBuffer buff = BufferUtils.createFloatBuffer(9);
+		min = new VectorBuff3(buff, 0);
+		min.setV(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+		max = new VectorBuff3(buff, 3);
+		max.setV(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
+		center = new VectorBuff3(buff, 6);
 	}
 
 	public void reset() {
-		int dim = min.dimension();
-		final float[] low = new float[dim];
-		final float[] high = new float[dim];
-		for (int i = 0; i < dim; i++) {
-			low[i] = Float.MAX_VALUE;
-			high[i] = -Float.MAX_VALUE;
-		}
-		min.setV(low);
-		max.setV(high);
+		min.setV(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+		max.setV(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
 		center.multiply(0);
 	}
 
-	public Vector getMin() {
+	public VectorBuff3 getMin() {
 		return min;
 	}
 
-	public Vector getMax() {
+	public VectorBuff3 getMax() {
 		return max;
 	}
 
-	public Vector getCenter() {
+	public VectorBuff3 getCenter() {
 		return center;
 	}
 
@@ -58,20 +50,18 @@ public class BoundingArea {
 		return radius;
 	}
 
-	public void include(Vector v) {
-		if (v.dimension() != min.dimension())
-			throw new IllegalArgumentException("Mismatched dimensions.");
+	public void include(VectorBuff v) {
 		for (int i = 0; i < v.dimension(); i++) {
 			if (min.get(i) > v.get(i))
 				min.set(i, v.get(i));
 			if (max.get(i) < v.get(i))
 				max.set(i, v.get(i));
 		}
-		Vector.linearComb(center, min, .5f, max, .5f);
+		center.linearComb(min, .5f, max, .5f);
 		radius = center.dist(min);
 	}
 
-	public boolean contains(Vector v) {
+	public boolean contains(VectorBuff v) {
 		if (v.dimension() != min.dimension())
 			throw new IllegalArgumentException("Mismatched dimensions.");
 		for (int i = 0; i < v.dimension(); i++) {
@@ -83,7 +73,7 @@ public class BoundingArea {
 		return true;
 	}
 
-	public boolean rayIntersects(Vector O, Vector D) {
+	public boolean rayIntersects(VectorBuff3 O, VectorBuff3 D) {
 		return MathUtil.rayIntersectsSphere(O, D, center, radius)
 				&& MathUtil.rayIntersectsBox(O, D, min, max);
 	}

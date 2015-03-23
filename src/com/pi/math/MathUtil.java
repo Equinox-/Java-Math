@@ -3,98 +3,68 @@ package com.pi.math;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.pi.math.vector.Vector;
-import com.pi.math.vector.VectorND;
+import com.pi.math.vector.VectorBuff;
+import com.pi.math.vector.VectorBuff3;
 
 public class MathUtil {
 	public static final float EPSILON = .00001f;
 
 	@SuppressWarnings("unchecked")
 	// 1-4D vectors
-	private static final LinkedBlockingQueue<Vector>[] VECTOR_HEAP = new LinkedBlockingQueue[4];
+	private static final LinkedBlockingQueue<VectorBuff>[] VECTOR_HEAP = new LinkedBlockingQueue[4];
 	static {
 		for (int d = 0; d < VECTOR_HEAP.length; d++) {
 			VECTOR_HEAP[d] = new LinkedBlockingQueue<>(d == 3 ? 128 : 16);
 			while (VECTOR_HEAP[d].remainingCapacity() > 0)
-				VECTOR_HEAP[d].offer(new VectorND(new float[d + 1]));
+				VECTOR_HEAP[d].offer(VectorBuff.make(d + 1));
 		}
 	}
 
-	public static Vector checkout(int dim) {
+	@SuppressWarnings("unchecked")
+	public static <T extends VectorBuff> T checkout(int dim) {
 		if (dim <= 0 || dim > VECTOR_HEAP.length)
-			return new VectorND(new float[dim]);
-		Queue<Vector> src = VECTOR_HEAP[dim - 1];
+			return (T) VectorBuff.make(dim);
+		Queue<VectorBuff> src = VECTOR_HEAP[dim - 1];
 		if (src.isEmpty()) {
-			System.out.println("Heap D" + dim + " missed");
-			return new VectorND(new float[dim]);
+			return (T) VectorBuff.make(dim);
 		}
-		return src.poll();
+		return (T) src.poll();
 	}
 
-	public static void checkin(Vector v) {
+	public static void checkin(VectorBuff v) {
 		int dim = v.dimension();
 		if (dim <= 0 || dim > VECTOR_HEAP.length)
 			return;
-		Queue<Vector> src = VECTOR_HEAP[dim - 1];
+		Queue<VectorBuff> src = VECTOR_HEAP[dim - 1];
 		if (!src.offer(v)) {
-			System.out.println("Heap overfill: ");
 			new Exception().printStackTrace();
 		}
 	}
 
-	private static Vector subtract(Vector lhs, Vector rhs) {
+	private static <T extends VectorBuff> T subtract(T lhs, T rhs) {
 		lhs.check(rhs);
-		Vector dest = MathUtil.checkout(lhs.dimension());
-		for (int k = 0; k < lhs.dimension(); k++)
-			dest.set(k, lhs.get(k) - rhs.get(k));
+		T dest = MathUtil.checkout(lhs.dimension());
+		dest.linearComb(lhs, 1, rhs, -1);
 		return dest;
 	}
 
-	/**
-	 * [distance from segment, distance on line, distance on infinite line, distance from infinite line]
-	 */
-	public static float[] getRelationToLine(Vector point, Vector lineA,
-			Vector lineB) {
-		Vector lineNormal = subtract(lineB, lineA);
-		Vector pointNormal = subtract(point, lineA);
-		float lineMag = lineNormal.magnitude();
-		float pointMag = pointNormal.magnitude();
-		float baseLen = Vector.dotProduct(lineNormal, pointNormal) / lineMag;
-		float angle = (float) Math.acos(baseLen / pointMag);
-		float thickness = (float) (Math.sin(angle) * pointMag);
-
-		float[] res;
-		if (baseLen > lineMag) {
-			res = new float[] { lineB.dist(point), lineNormal.magnitude(),
-					baseLen, thickness };
-		} else if (angle > Math.PI / 2) {
-			res = new float[] { pointMag, 0, baseLen, thickness };
-		} else {
-			res = new float[] { thickness, baseLen, thickness };
-		}
-
-		checkin(lineNormal);
-		checkin(pointNormal);
-
-		return res;
-	}
-
-	public static Vector getPointOnRay(Vector dest, Vector origin,
-			Vector normal, Vector near) {
-		Vector pointNormal = subtract(near, origin);
+	public static VectorBuff3 getPointOnRay(VectorBuff3 dest,
+			VectorBuff3 origin, VectorBuff3 normal, VectorBuff3 near) {
+		VectorBuff3 pointNormal = subtract(near, origin);
 		float distOnLine = pointNormal.dot(normal);
-		Vector.linearComb(dest, origin, 1, normal, distOnLine);
+		dest.linearComb(origin, 1, normal, distOnLine);
 		checkin(pointNormal);
 		return dest;
 	}
 
-	public static Vector rayIntersectsTriangle(Vector dest, Vector O, Vector D, Vector v0,
-			Vector v1, Vector v2) {
+	public static VectorBuff3 rayIntersectsTriangle(VectorBuff3 dest,
+			VectorBuff3 O, VectorBuff3 D, VectorBuff3 v0, VectorBuff3 v1,
+			VectorBuff3 v2) {
 		// Moller-Trumbore ray-triangle intersection algorithm
 		// http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 
-		Vector e1 = null, e2 = null; // Edge1, Edge2
-		Vector P = null, Q = null, T = null;
+		VectorBuff3 e1 = null, e2 = null; // Edge1, Edge2
+		VectorBuff3 P = null, Q = null, T = null;
 		float det, inv_det, u, v;
 		float t;
 
@@ -103,7 +73,8 @@ public class MathUtil {
 			e1 = subtract(v1, v0);
 			e2 = subtract(v2, v0);
 			// Begin calculating determinant - also used to calculate u parameter
-			P = Vector.crossProduct(checkout(3), D, e2);
+			P = checkout(3);
+			P.cross(D, e2);
 
 			// if determinant is near zero, ray lies in plane of triangle
 			det = e1.dot(P);
@@ -121,7 +92,8 @@ public class MathUtil {
 				return null;
 
 			// Prepare to test v parameter
-			Q = Vector.crossProduct(checkout(3), T, e1);
+			Q = checkout(3);
+			Q.cross(T, e1);
 
 			// Calculate V parameter and test bound
 			v = D.dot(Q) * inv_det;
@@ -132,7 +104,7 @@ public class MathUtil {
 			t = e2.dot(Q) * inv_det;
 
 			if (t > EPSILON) { // ray intersection
-				return Vector.linearComb(dest, O, 1, D, t);
+				return dest.linearComb(O, 1, D, t);
 			}
 
 			// No hit, no win
@@ -148,18 +120,18 @@ public class MathUtil {
 		}
 	}
 
-	public static boolean rayIntersectsSphere(Vector O, Vector D,
-			Vector center, float radius) {
-		Vector oMC = subtract(O, center);
+	public static boolean rayIntersectsSphere(VectorBuff3 O, VectorBuff3 D,
+			VectorBuff3 center, float radius) {
+		VectorBuff3 oMC = subtract(O, center);
 		float b = D.dot(oMC);
 		float c = D.mag2() * (oMC.mag2() - radius * radius);
 		checkin(oMC);
 		return Math.abs(b * b - c) > -MathUtil.EPSILON;
 	}
 
-	public static boolean rayIntersectsBox(Vector O, Vector D, Vector min,
-			Vector max) {
-		Vector maxT = checkout(3);
+	public static boolean rayIntersectsBox(VectorBuff3 O, VectorBuff3 D,
+			VectorBuff3 min, VectorBuff3 max) {
+		VectorBuff3 maxT = checkout(3);
 		try {
 			boolean inside = true;
 			for (int i = 0; i < maxT.dimension(); i++)
@@ -205,22 +177,5 @@ public class MathUtil {
 		} finally {
 			checkin(maxT);
 		}
-	}
-
-	public static float getMinDistanceBetweenLines(Vector[] lineA,
-			Vector[] lineB) {
-		Vector dirA = subtract(lineA[1], lineA[0]).normalize();
-		Vector dirB = subtract(lineB[1], lineB[0]).normalize();
-		Vector normal = Vector.crossProduct(checkout(3), dirA, dirB)
-				.normalize();
-
-		float dA = -Vector.dotProduct(normal, lineA[0]);
-		float dB = -Vector.dotProduct(normal, lineB[0]);
-
-		checkin(dirA);
-		checkin(dirB);
-		checkin(normal);
-
-		return Math.abs(dA - dB);
 	}
 }

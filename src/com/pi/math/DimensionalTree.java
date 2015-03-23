@@ -3,11 +3,14 @@ package com.pi.math;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.lwjgl.BufferUtils;
+
 import com.pi.math.vector.Positionable;
 import com.pi.math.vector.Vector;
+import com.pi.math.vector.VectorBuff3;
 import com.pi.math.volume.BoundingArea;
 
-public class DimensionalTree<E extends Positionable> {
+public class DimensionalTree<E extends Positionable<VectorBuff3>> {
 	final BoundingArea area;
 	private final int maxElements;
 	ArrayList<E> elements;
@@ -33,8 +36,6 @@ public class DimensionalTree<E extends Positionable> {
 		}
 		// We aren't a leaf. Decide on the tree, and map it out.
 		Vector pos = item.position();
-		if (pos.dimension() != 3)
-			throw new IllegalArgumentException("Only 3D postions.");
 		int id = 0;
 		for (int k = 0; k < area.getCenter().dimension(); k++) {
 			id = (id << 1) | (pos.get(k) < area.getCenter().get(k) ? 1 : 0);
@@ -98,7 +99,8 @@ public class DimensionalTree<E extends Positionable> {
 		subTree = new DimensionalTree[1 << area.getCenter().dimension()];
 
 		for (int k = 0; k < subTree.length; k++) {
-			Vector other = area.getMax().clone();
+			VectorBuff3 other = new VectorBuff3();
+			other.set(area.getMax());
 			for (int c = 0; c < other.dimension(); c++) {
 				final int mask = 1 << (other.dimension() - c - 1);
 				if ((k & mask) == mask) {

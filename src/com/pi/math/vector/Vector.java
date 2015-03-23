@@ -5,15 +5,18 @@ import com.pi.math.MathUtil;
 
 public abstract class Vector {
 	private static final boolean DIMENSION_CHECK = false;
+	public static boolean ALLOW_ALLOCATION = true;
+
+	protected Vector() {
+		if (!Vector.ALLOW_ALLOCATION)
+			throw new RuntimeException("No allocation atm");
+	}
 
 	public abstract float get(int d);
 
 	public abstract void set(int d, float r);
 
 	public abstract int dimension();
-
-	@Override
-	public abstract Vector clone();
 
 	public final void check(Vector t) {
 		if (DIMENSION_CHECK) {
@@ -60,7 +63,7 @@ public abstract class Vector {
 		return r;
 	}
 
-	public Vector normalize() {
+	public final Vector normalize() {
 		return multiply(FastMath.Q_rsqrt(mag2()));
 	}
 
@@ -105,36 +108,16 @@ public abstract class Vector {
 		return this;
 	}
 
-	public static Vector projectOntoPlane(Vector planeNormal, Vector vector) {
-		planeNormal.check(vector);
-		return vector.clone().subtract(
-				planeNormal.clone().multiply(vector.dot(planeNormal)));
-	}
-
-	public static Vector normalize(Vector p) {
-		return p.clone().normalize();
-	}
-
-	public static Vector negative(Vector p) {
-		return p.clone().multiply(-1f);
-	}
-
 	public static float dotProduct(Vector u, Vector v) {
 		u.check(v);
 		return u.dot(v);
 	}
 
-	public static Vector linearComb(Vector dest, Vector a, float aC, Vector b,
-			float bC) {
-		a.check(b);
-
-		for (int i = 0; i < Math.min(a.dimension(), dest.dimension()); i++)
-			dest.set(i, a.get(i) * aC + b.get(i) * bC);
-		return dest;
-	}
-
-	public static Vector crossProduct(Vector u, Vector v) {
-		return crossProduct(new VectorND(new float[3]), u, v);
+	public Vector linearComb(Vector a, float aC, Vector b, float bC) {
+		check(b);
+		for (int i = 0; i < Math.min(a.dimension(), b.dimension()); i++)
+			set(i, a.get(i) * aC + b.get(i) * bC);
+		return this;
 	}
 
 	public static Vector crossProduct(Vector dest, Vector u, Vector v) {
@@ -144,6 +127,17 @@ public abstract class Vector {
 		return dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
 				(u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
+	}
+
+	public static VectorBuff3 crossProduct(VectorBuff3 dest, VectorBuff3 u,
+			VectorBuff3 v) {
+		if (u.dimension() != 3 || v.dimension() != 3 || dest.dimension() != 3)
+			throw new IllegalArgumentException(
+					"Cross product is only valid in three dimensions");
+		dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
+				(u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
+				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
+		return dest;
 	}
 
 	@Override
@@ -179,6 +173,6 @@ public abstract class Vector {
 		final float weightA = (float) (Math.sin((1 - t) * angle) / Math
 				.sin(angle));
 		final float weightB = (float) (Math.sin(t * angle) / Math.sin(angle));
-		return Vector.linearComb(dest, a, weightA, b, weightB);
+		return dest.linearComb(a, weightA, b, weightB);
 	}
 }
