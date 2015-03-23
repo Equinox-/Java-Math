@@ -8,6 +8,10 @@ import org.lwjgl.BufferUtils;
 import com.pi.math.vector.Vector;
 
 public final class Matrix4 {
+	private static final float[] ZERO = new float[16];
+	private static final float[] IDENTITY = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+			0, 0, 0, 0, 1 };
+
 	private final FloatBuffer data;
 
 	public Matrix4() {
@@ -31,16 +35,15 @@ public final class Matrix4 {
 	}
 
 	public void zero() {
-		for (int i = 0; i < 16; i++)
-			this.put(i, 0);
+		data.position(0);
+		data.put(ZERO);
+		data.position(0);
 	}
 
 	public Matrix4 makeIdentity() {
-		zero();
-		put(0, 1);
-		put(5, 1);
-		put(10, 1);
-		put(15, 1);
+		data.position(0);
+		data.put(IDENTITY);
+		data.position(0);
 		return this;
 	}
 
@@ -59,9 +62,9 @@ public final class Matrix4 {
 			this.put(i, this.get(i) + from.get(i));
 	}
 
-	public void lincom(Matrix4 from, float f) {
+	public void lincom(float a, Matrix4 bm, float b) {
 		for (int i = 0; i < 16; i++)
-			this.put(i, this.get(i) + from.get(i) * f);
+			this.put(i, a * this.get(i) + bm.get(i) * b);
 	}
 
 	/**
@@ -238,30 +241,15 @@ public final class Matrix4 {
 	}
 
 	public static Matrix4 transpose(final Matrix4 mat) {
-		Matrix4 res = mat.copy();
-		res.put(1, mat.get(4));
-		res.put(2, mat.get(8));
-		res.put(3, mat.get(12));
-
-		res.put(6, mat.get(9));
-		res.put(7, mat.get(13));
-
-		res.put(11, mat.get(14));
-
-		res.put(4, mat.get(1));
-		res.put(8, mat.get(2));
-		res.put(12, mat.get(3));
-
-		res.put(9, mat.get(6));
-		res.put(13, mat.get(7));
-
-		res.put(14, mat.get(11));
-		return res;
+		return mat.copy().transposeInPlace();
 	}
 
 	public Matrix4 copyTo(Matrix4 res) {
-		for (int i = 0; i < 16; i++)
-			res.put(i, get(i));
+		res.data.position(0);
+		data.position(0);
+		res.data.put(data);
+		res.data.position(0);
+		data.position(0);
 		return res;
 	}
 
@@ -353,6 +341,7 @@ public final class Matrix4 {
 	}
 
 	public FloatBuffer getAccessor() {
+		data.position(0);
 		return data;
 	}
 
