@@ -126,7 +126,7 @@ public class MathUtil {
 		float b = D.dot(oMC);
 		float c = D.mag2() * (oMC.mag2() - radius * radius);
 		checkin(oMC);
-		return Math.abs(b * b - c) > -MathUtil.EPSILON;
+		return (b * b - c) > -MathUtil.EPSILON;
 	}
 
 	public static boolean rayIntersectsBox(VectorBuff3 O, VectorBuff3 D,

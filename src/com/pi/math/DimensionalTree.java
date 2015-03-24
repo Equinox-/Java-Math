@@ -3,8 +3,6 @@ package com.pi.math;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.lwjgl.BufferUtils;
-
 import com.pi.math.vector.Positionable;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff3;
