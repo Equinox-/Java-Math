@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 
 import com.pi.math.vector.Vector;
+import com.pi.math.vector.VectorBuff3;
 
 public final class Matrix4 {
 	private static final float[] ZERO = new float[16];
@@ -303,6 +304,10 @@ public final class Matrix4 {
 		return setTranslation(a.dimension() > 0 ? a.get(0) : 0,
 				a.dimension() > 1 ? a.get(1) : 0, a.dimension() > 2 ? a.get(2)
 						: 0);
+	}
+
+	public Matrix4 setTranslation(final VectorBuff3 a) {
+		return setTranslation(a.get(0), a.get(1), a.get(2));
 	}
 
 	public Matrix4 setTranslation(final float x, final float y, final float z) {
