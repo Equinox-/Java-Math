@@ -32,7 +32,7 @@ public class MathUtil {
 		if (src.isEmpty()) {
 			return (T) VectorBuff.make(dim);
 		}
-		return (T) src.poll();
+		return (T) src.poll().multiply(0); // Zero it
 	}
 
 	public static void checkin(VectorBuff v) {
