@@ -45,7 +45,7 @@ public class DimensionalTree<E extends Positionable<VectorBuff3>> {
 		return getContents(null);
 	}
 
-	public Iterable<E> getContents(Filter<BoundingArea> filter) {
+	public Iterable<E> getContents(final Filter<BoundingArea> filter) {
 		return new Iterable<E>() {
 			@Override
 			public Iterator<E> iterator() {
