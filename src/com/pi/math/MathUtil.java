@@ -20,6 +20,10 @@ public class MathUtil {
 		}
 	}
 
+	public static VectorBuff3 checkout3() {
+		return (VectorBuff3) checkout(3);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static <T extends VectorBuff> T checkout(int dim) {
 		if (dim <= 0 || dim > VECTOR_HEAP.length)
