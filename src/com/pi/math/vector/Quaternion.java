@@ -1,7 +1,7 @@
 package com.pi.math.vector;
 
 public class Quaternion {
-	private static void checkDim(Vector f) {
+	public static void checkDim(Vector f) {
 		if (f.dimension() != 4)
 			throw new IllegalArgumentException(
 					"Quaternion functions only work on 4D vectors");

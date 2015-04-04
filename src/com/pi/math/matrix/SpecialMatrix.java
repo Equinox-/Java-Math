@@ -1,5 +1,10 @@
 package com.pi.math.matrix;
 
+import com.pi.math.MathUtil;
+import com.pi.math.vector.Quaternion;
+import com.pi.math.vector.Vector;
+import com.pi.math.vector.VectorBuff4;
+
 public final class SpecialMatrix {
 	public static Matrix4 axisAngle(final Matrix4 m, final float angle,
 			final float x, final float y, final float z) {
@@ -104,5 +109,64 @@ public final class SpecialMatrix {
 		m.put(14, -(far + near) / length);
 		m.put(15, 1);
 		return m;
+	}
+
+	public static Matrix4 toCompleteTransform(Matrix4 dest,
+			final Vector eulerRot, final Vector scale, final Vector pos) {
+		VectorBuff4 tmpQuat = MathUtil.checkout(4);
+		Quaternion.fromEulerAngles(tmpQuat, eulerRot);
+		dest.setQuaternion(tmpQuat);
+		for (int k = 0; k < 3; k++)
+			for (int j = 0; j < 3; j++)
+				dest.put((k << 2) + j, dest.get((k << 2) + j) * scale.get(k));
+		SpecialMatrix.translation(dest, pos.get(0), pos.get(1), pos.get(2));
+		MathUtil.checkin(tmpQuat);
+		return dest;
+	}
+
+	private static final Matrix4 tmp = new Matrix4();
+
+	public static void fromCompleteTransform(final Matrix4 src,
+			Vector eulerRot, Vector scale, Vector pos) {
+		// First decompose the scale: grab the translation
+		src.copyTo(tmp);
+		// Decompose scale
+		pos.setV(tmp.get(12), tmp.get(13), tmp.get(14));
+		for (int l = 0; l < 3; l++) {
+			scale.set(
+					l,
+					(float) Math.sqrt(tmp.get(l) * tmp.get(l) + tmp.get(4 + l)
+							* tmp.get(4 + l) + tmp.get(8 + l) * tmp.get(8 + l)));
+			for (int k = 0; k <= 8; k += 4)
+				tmp.put(l + k, tmp.get(l + k) / scale.get(l));
+		}
+		// Decompose rotation. (This is finicky)
+		float tr = tmp.get(0) + tmp.get(5) + tmp.get(10);
+
+		VectorBuff4 quat = MathUtil.checkout(4);
+		if (tr > 0) {
+			float S = (float) Math.sqrt(tr + 1.0) * 2; // S=4*qw
+			quat.setV(0.25f * S, (tmp.get(9) - tmp.get(9)) / S,
+					(tmp.get(8) - tmp.get(2)) / S, (tmp.get(1) - tmp.get(4))
+							/ S);
+		} else if ((tmp.get(0) > tmp.get(5)) & (tmp.get(0) > tmp.get(10))) {
+			float S = (float) Math.sqrt(1.0 + tmp.get(0) - tmp.get(5)
+					- tmp.get(10)) * 2; // S=4*qx
+			quat.setV((tmp.get(9) - tmp.get(9)) / S, 0.25f * S,
+					(tmp.get(4) + tmp.get(1)) / S, (tmp.get(8) + tmp.get(2))
+							/ S);
+		} else if (tmp.get(5) > tmp.get(10)) {
+			float S = (float) Math.sqrt(1.0 + tmp.get(5) - tmp.get(0)
+					- tmp.get(10)) * 2; // S=4*qy
+			quat.setV((tmp.get(8) - tmp.get(2)) / S, (tmp.get(4) + tmp.get(1))
+					/ S, 0.25f * S, (tmp.get(9) + tmp.get(9)) / S);
+		} else {
+			float S = (float) Math.sqrt(1.0 + tmp.get(10) - tmp.get(0)
+					- tmp.get(5)) * 2; // S=4*qz
+			quat.setV((tmp.get(1) - tmp.get(4)) / S, (tmp.get(8) + tmp.get(2))
+					/ S, (tmp.get(9) + tmp.get(9)) / S, 0.25f * S);
+		}
+		quat.normalize();
+		Quaternion.toEulerAngles(quat, eulerRot);
 	}
 }
