@@ -1,53 +1,44 @@
 package com.pi.math;
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import com.pi.math.vector.VectorBuff;
 import com.pi.math.vector.VectorBuff3;
 
 public class MathUtil {
 	public static final float EPSILON = .00001f;
 
-	@SuppressWarnings("unchecked")
 	// 1-4D vectors
-	private static final LinkedBlockingQueue<VectorBuff>[] VECTOR_HEAP = new LinkedBlockingQueue[4];
+	private static final int[] VECTOR_HEAP_SIZE = new int[4];
+	private static final VectorBuff[][] VECTOR_HEAP = new VectorBuff[4][];
 	static {
 		for (int d = 0; d < VECTOR_HEAP.length; d++) {
-			VECTOR_HEAP[d] = new LinkedBlockingQueue<>(d == 3 ? 128 : 16);
-			while (VECTOR_HEAP[d].remainingCapacity() > 0)
-				VECTOR_HEAP[d].offer(VectorBuff.make(d + 1));
+			VECTOR_HEAP[d] = new VectorBuff[d + 1 == 3 ? 128 : 16];
+			while (VECTOR_HEAP_SIZE[d] < VECTOR_HEAP[d].length)
+				VECTOR_HEAP[d][VECTOR_HEAP_SIZE[d]++] = VectorBuff.make(d + 1);
 		}
 	}
 
 	public static VectorBuff3 checkout3() {
 		return (VectorBuff3) checkout(3);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T extends VectorBuff> T checkout(int dim) {
-		if (dim <= 0 || dim > VECTOR_HEAP.length)
+		if (dim <= 0 || dim > VECTOR_HEAP.length
+				|| VECTOR_HEAP_SIZE[dim - 1] <= 0)
 			return (T) VectorBuff.make(dim);
-		Queue<VectorBuff> src = VECTOR_HEAP[dim - 1];
-		if (src.isEmpty()) {
-			return (T) VectorBuff.make(dim);
-		}
-		return (T) src.poll().multiply(0); // Zero it
+		return (T) VECTOR_HEAP[dim - 1][--VECTOR_HEAP_SIZE[dim - 1]];
 	}
 
 	public static void checkin(VectorBuff v) {
 		int dim = v.dimension();
-		if (dim <= 0 || dim > VECTOR_HEAP.length)
+		if (dim <= 0 || dim > VECTOR_HEAP.length
+				|| VECTOR_HEAP_SIZE[dim - 1] >= VECTOR_HEAP[dim - 1].length)
 			return;
-		Queue<VectorBuff> src = VECTOR_HEAP[dim - 1];
-		if (!src.offer(v)) {
-			new Exception().printStackTrace();
-		}
+		VECTOR_HEAP[dim - 1][VECTOR_HEAP_SIZE[dim - 1]++] = v;
 	}
 
-	private static <T extends VectorBuff> T subtract(T lhs, T rhs) {
-		lhs.check(rhs);
-		T dest = MathUtil.checkout(lhs.dimension());
+	private static VectorBuff3 subtract(VectorBuff3 lhs, VectorBuff3 rhs) {
+		VectorBuff3 dest = MathUtil.checkout(3);
 		dest.linearComb(lhs, 1, rhs, -1);
 		return dest;
 	}

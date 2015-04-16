@@ -102,10 +102,7 @@ public abstract class Vector {
 	}
 
 	public Vector linearComb(float aC, Vector b, float bC) {
-		check(b);
-		for (int i = 0; i < dimension(); i++)
-			set(i, get(i) * aC + b.get(i) * bC);
-		return this;
+		return linearComb(this, aC, b, bC);
 	}
 
 	public static float dotProduct(Vector u, Vector v) {

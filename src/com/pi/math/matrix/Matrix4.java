@@ -345,6 +345,14 @@ public final class Matrix4 {
 		return this;
 	}
 
+	public Matrix4 preMultiplyTransform(float x, float y) {
+		put(12, get(0) * x + get(4) * y + get(12));
+		put(13, get(1) * x + get(5) * y + get(13));
+		put(14, get(2) * x + get(6) * y + get(14));
+		put(15, get(3) * x + get(7) * y + get(15));
+		return this;
+	}
+
 	public FloatBuffer getAccessor() {
 		data.position(0);
 		return data;
