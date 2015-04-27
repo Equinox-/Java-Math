@@ -9,23 +9,23 @@ import com.pi.math.vector.VectorBuff;
 import com.pi.math.vector.VectorBuff3;
 
 public class BoundingArea {
-	private VectorBuff3 min, max;
-	private VectorBuff3 center;
+	private VectorBuff min, max;
+	private VectorBuff center;
 	private float radius;
 
-	public BoundingArea(VectorBuff3 min, VectorBuff3 max) {
-		this();
+	public BoundingArea(VectorBuff min, VectorBuff max) {
+		this(min.dimension());
 		include(min);
 		include(max);
 	}
 
-	public BoundingArea() {
-		FloatBuffer buff = BufferUtils.createFloatBuffer(9);
-		min = new VectorBuff3(buff, 0);
+	public BoundingArea(int dimension) {
+		FloatBuffer buff = BufferUtils.createFloatBuffer(3 * dimension);
+		min = VectorBuff.make(buff, 0, dimension);
 		min.setV(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
-		max = new VectorBuff3(buff, 3);
+		max = VectorBuff.make(buff, dimension, dimension);
 		max.setV(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
-		center = new VectorBuff3(buff, 6);
+		center = VectorBuff.make(buff, 2 * dimension, dimension);
 	}
 
 	public void reset() {
@@ -34,15 +34,15 @@ public class BoundingArea {
 		center.multiply(0);
 	}
 
-	public VectorBuff3 getMin() {
+	public VectorBuff getMin() {
 		return min;
 	}
 
-	public VectorBuff3 getMax() {
+	public VectorBuff getMax() {
 		return max;
 	}
 
-	public VectorBuff3 getCenter() {
+	public VectorBuff getCenter() {
 		return center;
 	}
 
@@ -51,6 +51,8 @@ public class BoundingArea {
 	}
 
 	public void include(VectorBuff v) {
+		if (v.dimension() != min.dimension())
+			throw new IllegalArgumentException("Mismatched dimensions.");
 		for (int i = 0; i < v.dimension(); i++) {
 			if (min.get(i) > v.get(i))
 				min.set(i, v.get(i));
@@ -74,7 +76,11 @@ public class BoundingArea {
 	}
 
 	public boolean rayIntersects(VectorBuff3 O, VectorBuff3 D) {
-		return MathUtil.rayIntersectsSphere(O, D, center, radius)
-				&& MathUtil.rayIntersectsBox(O, D, min, max);
+		if (min.dimension() != 3)
+			throw new IllegalArgumentException(
+					"Ray intersection only allowed in 3-space.");
+		return MathUtil.rayIntersectsSphere(O, D, (VectorBuff3) center, radius)
+				&& MathUtil.rayIntersectsBox(O, D, (VectorBuff3) min,
+						(VectorBuff3) max);
 	}
 }
