@@ -2,8 +2,7 @@ package com.pi.math.volume;
 
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
-
+import com.pi.math.BufferProvider;
 import com.pi.math.MathUtil;
 import com.pi.math.vector.VectorBuff;
 import com.pi.math.vector.VectorBuff3;
@@ -20,7 +19,7 @@ public class BoundingArea {
 	}
 
 	public BoundingArea(int dimension) {
-		FloatBuffer buff = BufferUtils.createFloatBuffer(3 * dimension);
+		FloatBuffer buff = BufferProvider.createFloatBuffer(3 * dimension);
 		min = VectorBuff.make(buff, 0, dimension);
 		min.setV(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 		max = VectorBuff.make(buff, dimension, dimension);

@@ -1,30 +1,38 @@
 package com.pi.math;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import com.pi.math.vector.Positionable;
 import com.pi.math.vector.Vector;
+import com.pi.math.vector.VectorBuff;
 import com.pi.math.vector.VectorBuff3;
 import com.pi.math.volume.BoundingArea;
 
 public class DimensionalTree<E extends Positionable<VectorBuff3>> {
 	final BoundingArea area;
 	private final int maxElements;
+
 	ArrayList<E> elements;
+	Set<VectorBuff> uniqElements;
+
 	DimensionalTree<E>[] subTree = null;
 
 	public DimensionalTree(BoundingArea base, int maxE) {
 		this.area = base;
 		this.maxElements = maxE;
 		this.elements = new ArrayList<>(maxE);
+		this.uniqElements = new HashSet<>();
 	}
 
 	public void insert(E item) {
 		if (subTree == null) {
-			if (this.elements.size() < maxElements) {
+			if (this.uniqElements.size() < maxElements) {
 				// We are a leaf, and don't have an item
 				this.elements.add(item);
+				this.uniqElements.add(item.position());
 				return;
 			} else {
 				// We are a leaf, we have an item. Need to subdivide and
@@ -97,7 +105,7 @@ public class DimensionalTree<E extends Positionable<VectorBuff3>> {
 		subTree = new DimensionalTree[1 << area.getCenter().dimension()];
 
 		for (int k = 0; k < subTree.length; k++) {
-			VectorBuff3 other = new VectorBuff3();
+			VectorBuff other = VectorBuff.make(area.getCenter().dimension());
 			other.set(area.getMax());
 			for (int c = 0; c < other.dimension(); c++) {
 				final int mask = 1 << (other.dimension() - c - 1);
@@ -111,6 +119,7 @@ public class DimensionalTree<E extends Positionable<VectorBuff3>> {
 
 		ArrayList<E> prev = this.elements;
 		this.elements = null;
+		this.uniqElements = null;
 		for (E e : prev)
 			insert(e);
 	}

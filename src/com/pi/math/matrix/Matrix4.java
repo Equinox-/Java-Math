@@ -3,8 +3,7 @@ package com.pi.math.matrix;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
-
+import com.pi.math.BufferProvider;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff3;
 
@@ -16,7 +15,7 @@ public final class Matrix4 {
 	private final FloatBuffer data;
 
 	public Matrix4() {
-		this.data = BufferUtils.createFloatBuffer(16);
+		this.data = BufferProvider.createFloatBuffer(16);
 	}
 
 	public Matrix4(ByteBuffer f, int offset) {

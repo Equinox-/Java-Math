@@ -2,7 +2,7 @@ package com.pi.math.vector;
 
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
+import com.pi.math.BufferProvider;
 
 public class VectorBuff4 extends VectorBuff {
 	public VectorBuff4(FloatBuffer data, int offset) {
@@ -10,7 +10,7 @@ public class VectorBuff4 extends VectorBuff {
 	}
 
 	public VectorBuff4() {
-		this(BufferUtils.createFloatBuffer(4), 0);
+		this(BufferProvider.createFloatBuffer(4), 0);
 	}
 
 	public VectorBuff4 add(VectorBuff4 r) {

@@ -2,7 +2,7 @@ package com.pi.math.vector;
 
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
+import com.pi.math.BufferProvider;
 
 public class VectorBuff extends Vector {
 	protected final FloatBuffer data;
@@ -66,11 +66,12 @@ public class VectorBuff extends Vector {
 	}
 
 	public FloatBuffer getAccessor() {
+		data.position(0);
 		return data;
 	}
 
 	public static VectorBuff make(int d) {
-		return make(BufferUtils.createFloatBuffer(d), 0, d);
+		return make(BufferProvider.createFloatBuffer(d), 0, d);
 	}
 
 	public static VectorBuff make(FloatBuffer f, int off, int d) {
