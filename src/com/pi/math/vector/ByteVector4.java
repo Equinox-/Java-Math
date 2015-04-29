@@ -36,8 +36,8 @@ public class ByteVector4 extends ByteVector {
 	}
 
 	public ByteVector4 set(int argb) {
-		return set((argb >> 24) & 0xFF, (argb >> 16) & 0xFF,
-				(argb >> 8) & 0xFF, argb & 0xFF);
+		return set((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF,
+				(argb >> 24) & 0xFF);
 	}
 
 	public ByteVector4 set(Color src) {
