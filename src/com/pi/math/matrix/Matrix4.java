@@ -59,12 +59,12 @@ public final class Matrix4 {
 
 	public void add(Matrix4 from) {
 		for (int i = 0; i < 16; i++)
-			this.put(i, this.get(i) + from.get(i));
+			data.put(i, data.get(i) + from.data.get(i));
 	}
 
 	public void lincom(float a, Matrix4 bm, float b) {
 		for (int i = 0; i < 16; i++)
-			this.put(i, a * this.get(i) + bm.get(i) * b);
+			data.put(i, a * data.get(i) + bm.data.get(i) * b);
 	}
 
 	/**
@@ -78,20 +78,16 @@ public final class Matrix4 {
 			final Matrix4 b) {
 		for (int i = 0; i < 4; i++) {
 			final int j = i << 2;
-			final float ai0 = a.get(j), ai1 = a.get(j + 1), ai2 = a.get(j + 2), ai3 = a
-					.get(j + 3);
-			dest.put(j,
-					ai0 * b.get(0) + ai1 * b.get(4 + 0) + ai2 * b.get(8 + 0)
-							+ ai3 * b.get(12 + 0));
-			dest.put(j + 1,
-					ai0 * b.get(1) + ai1 * b.get(4 + 1) + ai2 * b.get(8 + 1)
-							+ ai3 * b.get(12 + 1));
-			dest.put(j + 2,
-					ai0 * b.get(2) + ai1 * b.get(4 + 2) + ai2 * b.get(8 + 2)
-							+ ai3 * b.get(12 + 2));
-			dest.put(j + 3,
-					ai0 * b.get(3) + ai1 * b.get(4 + 3) + ai2 * b.get(8 + 3)
-							+ ai3 * b.get(12 + 3));
+			final float ai0 = a.data.get(j), ai1 = a.data.get(j + 1), ai2 = a.data
+					.get(j + 2), ai3 = a.data.get(j + 3);
+			dest.data.put(j, ai0 * b.data.get(0) + ai1 * b.data.get(4 + 0)
+					+ ai2 * b.data.get(8 + 0) + ai3 * b.data.get(12 + 0));
+			dest.data.put(j + 1, ai0 * b.data.get(1) + ai1 * b.data.get(4 + 1)
+					+ ai2 * b.data.get(8 + 1) + ai3 * b.data.get(12 + 1));
+			dest.data.put(j + 2, ai0 * b.data.get(2) + ai1 * b.data.get(4 + 2)
+					+ ai2 * b.data.get(8 + 2) + ai3 * b.data.get(12 + 2));
+			dest.data.put(j + 3, ai0 * b.data.get(3) + ai1 * b.data.get(4 + 3)
+					+ ai2 * b.data.get(8 + 3) + ai3 * b.data.get(12 + 3));
 		}
 	}
 
@@ -108,99 +104,153 @@ public final class Matrix4 {
 	public Vector transform4(Vector output, final Vector input) {
 		final float inW = input.dimension() < 4 ? 1 : input.get(3);
 		for (int k = 0; k < output.dimension(); k++)
-			output.set(k, get(k) * input.get(0) + get(4 + k) * input.get(1)
-					+ get(8 + k) * input.get(2) + get(12 + k) * inW);
+			output.set(k,
+					data.get(k) * input.get(0) + data.get(4 + k) * input.get(1)
+							+ data.get(8 + k) * input.get(2) + data.get(12 + k)
+							* inW);
 		return output;
 	}
 
 	public Vector transform3(Vector output, final Vector input) {
 		for (int k = 0; k < output.dimension(); k++)
-			output.set(k, get(k) * input.get(0) + get(4 + k) * input.get(1)
-					+ get(8 + k) * input.get(2));
+			output.set(k,
+					data.get(k) * input.get(0) + data.get(4 + k) * input.get(1)
+							+ data.get(8 + k) * input.get(2));
 		return output;
-	}
-
-	public static Vector multiply(final Matrix4 a, final Vector v,
-			final Vector dest) {
-		final int cols = Math.min(4, v.dimension());
-		final int rows = Math.min(4, dest.dimension());
-		for (int row = 0; row < rows; row++) {
-			float comp = 0;
-			for (int col = 0; col < cols; col++)
-				comp += a.get(row + (col << 2)) * v.get(col);
-			dest.set(row, comp);
-		}
-		return dest;
 	}
 
 	// Matrix operations
 	public Matrix4 invertInto(Matrix4 res) {
-		res.put(0, get(5) * get(10) * get(15) - get(5) * get(11) * get(14)
-				- get(9) * get(6) * get(15) + get(9) * get(7) * get(14)
-				+ get(13) * get(6) * get(11) - get(13) * get(7) * get(10));
+		res.data.put(0, data.get(5) * data.get(10) * data.get(15) - data.get(5)
+				* data.get(11) * data.get(14) - data.get(9) * data.get(6)
+				* data.get(15) + data.get(9) * data.get(7) * data.get(14)
+				+ data.get(13) * data.get(6) * data.get(11) - data.get(13)
+				* data.get(7) * data.get(10));
 
-		res.put(4, -get(4) * get(10) * get(15) + get(4) * get(11) * get(14)
-				+ get(8) * get(6) * get(15) - get(8) * get(7) * get(14)
-				- get(12) * get(6) * get(11) + get(12) * get(7) * get(10));
+		res.data.put(
+				4,
+				-data.get(4) * data.get(10) * data.get(15) + data.get(4)
+						* data.get(11) * data.get(14) + data.get(8)
+						* data.get(6) * data.get(15) - data.get(8)
+						* data.get(7) * data.get(14) - data.get(12)
+						* data.get(6) * data.get(11) + data.get(12)
+						* data.get(7) * data.get(10));
 
-		res.put(8, get(4) * get(9) * get(15) - get(4) * get(11) * get(13)
-				- get(8) * get(5) * get(15) + get(8) * get(7) * get(13)
-				+ get(12) * get(5) * get(11) - get(12) * get(7) * get(9));
+		res.data.put(8, data.get(4) * data.get(9) * data.get(15) - data.get(4)
+				* data.get(11) * data.get(13) - data.get(8) * data.get(5)
+				* data.get(15) + data.get(8) * data.get(7) * data.get(13)
+				+ data.get(12) * data.get(5) * data.get(11) - data.get(12)
+				* data.get(7) * data.get(9));
 
-		res.put(12, -get(4) * get(9) * get(14) + get(4) * get(10) * get(13)
-				+ get(8) * get(5) * get(14) - get(8) * get(6) * get(13)
-				- get(12) * get(5) * get(10) + get(12) * get(6) * get(9));
+		res.data.put(
+				12,
+				-data.get(4) * data.get(9) * data.get(14) + data.get(4)
+						* data.get(10) * data.get(13) + data.get(8)
+						* data.get(5) * data.get(14) - data.get(8)
+						* data.get(6) * data.get(13) - data.get(12)
+						* data.get(5) * data.get(10) + data.get(12)
+						* data.get(6) * data.get(9));
 
-		res.put(1, -get(1) * get(10) * get(15) + get(1) * get(11) * get(14)
-				+ get(9) * get(2) * get(15) - get(9) * get(3) * get(14)
-				- get(13) * get(2) * get(11) + get(13) * get(3) * get(10));
+		res.data.put(
+				1,
+				-data.get(1) * data.get(10) * data.get(15) + data.get(1)
+						* data.get(11) * data.get(14) + data.get(9)
+						* data.get(2) * data.get(15) - data.get(9)
+						* data.get(3) * data.get(14) - data.get(13)
+						* data.get(2) * data.get(11) + data.get(13)
+						* data.get(3) * data.get(10));
 
-		res.put(5, get(0) * get(10) * get(15) - get(0) * get(11) * get(14)
-				- get(8) * get(2) * get(15) + get(8) * get(3) * get(14)
-				+ get(12) * get(2) * get(11) - get(12) * get(3) * get(10));
+		res.data.put(5, data.get(0) * data.get(10) * data.get(15) - data.get(0)
+				* data.get(11) * data.get(14) - data.get(8) * data.get(2)
+				* data.get(15) + data.get(8) * data.get(3) * data.get(14)
+				+ data.get(12) * data.get(2) * data.get(11) - data.get(12)
+				* data.get(3) * data.get(10));
 
-		res.put(9, -get(0) * get(9) * get(15) + get(0) * get(11) * get(13)
-				+ get(8) * get(1) * get(15) - get(8) * get(3) * get(13)
-				- get(12) * get(1) * get(11) + get(12) * get(3) * get(9));
+		res.data.put(9, -data.get(0) * data.get(9) * data.get(15) + data.get(0)
+				* data.get(11) * data.get(13) + data.get(8) * data.get(1)
+				* data.get(15) - data.get(8) * data.get(3) * data.get(13)
+				- data.get(12) * data.get(1) * data.get(11) + data.get(12)
+				* data.get(3) * data.get(9));
 
-		res.put(13, get(0) * get(9) * get(14) - get(0) * get(10) * get(13)
-				- get(8) * get(1) * get(14) + get(8) * get(2) * get(13)
-				+ get(12) * get(1) * get(10) - get(12) * get(2) * get(9));
+		res.data.put(13, data.get(0) * data.get(9) * data.get(14) - data.get(0)
+				* data.get(10) * data.get(13) - data.get(8) * data.get(1)
+				* data.get(14) + data.get(8) * data.get(2) * data.get(13)
+				+ data.get(12) * data.get(1) * data.get(10) - data.get(12)
+				* data.get(2) * data.get(9));
 
-		res.put(2, get(1) * get(6) * get(15) - get(1) * get(7) * get(14)
-				- get(5) * get(2) * get(15) + get(5) * get(3) * get(14)
-				+ get(13) * get(2) * get(7) - get(13) * get(3) * get(6));
+		res.data.put(
+				2,
+				data.get(1) * data.get(6) * data.get(15) - data.get(1)
+						* data.get(7) * data.get(14) - data.get(5)
+						* data.get(2) * data.get(15) + data.get(5)
+						* data.get(3) * data.get(14) + data.get(13)
+						* data.get(2) * data.get(7) - data.get(13)
+						* data.get(3) * data.get(6));
 
-		res.put(6, -get(0) * get(6) * get(15) + get(0) * get(7) * get(14)
-				+ get(4) * get(2) * get(15) - get(4) * get(3) * get(14)
-				- get(12) * get(2) * get(7) + get(12) * get(3) * get(6));
+		res.data.put(
+				6,
+				-data.get(0) * data.get(6) * data.get(15) + data.get(0)
+						* data.get(7) * data.get(14) + data.get(4)
+						* data.get(2) * data.get(15) - data.get(4)
+						* data.get(3) * data.get(14) - data.get(12)
+						* data.get(2) * data.get(7) + data.get(12)
+						* data.get(3) * data.get(6));
 
-		res.put(10, get(0) * get(5) * get(15) - get(0) * get(7) * get(13)
-				- get(4) * get(1) * get(15) + get(4) * get(3) * get(13)
-				+ get(12) * get(1) * get(7) - get(12) * get(3) * get(5));
+		res.data.put(
+				10,
+				data.get(0) * data.get(5) * data.get(15) - data.get(0)
+						* data.get(7) * data.get(13) - data.get(4)
+						* data.get(1) * data.get(15) + data.get(4)
+						* data.get(3) * data.get(13) + data.get(12)
+						* data.get(1) * data.get(7) - data.get(12)
+						* data.get(3) * data.get(5));
 
-		res.put(14, -get(0) * get(5) * get(14) + get(0) * get(6) * get(13)
-				+ get(4) * get(1) * get(14) - get(4) * get(2) * get(13)
-				- get(12) * get(1) * get(6) + get(12) * get(2) * get(5));
+		res.data.put(
+				14,
+				-data.get(0) * data.get(5) * data.get(14) + data.get(0)
+						* data.get(6) * data.get(13) + data.get(4)
+						* data.get(1) * data.get(14) - data.get(4)
+						* data.get(2) * data.get(13) - data.get(12)
+						* data.get(1) * data.get(6) + data.get(12)
+						* data.get(2) * data.get(5));
 
-		res.put(3, -get(1) * get(6) * get(11) + get(1) * get(7) * get(10)
-				+ get(5) * get(2) * get(11) - get(5) * get(3) * get(10)
-				- get(9) * get(2) * get(7) + get(9) * get(3) * get(6));
+		res.data.put(
+				3,
+				-data.get(1) * data.get(6) * data.get(11) + data.get(1)
+						* data.get(7) * data.get(10) + data.get(5)
+						* data.get(2) * data.get(11) - data.get(5)
+						* data.get(3) * data.get(10) - data.get(9)
+						* data.get(2) * data.get(7) + data.get(9) * data.get(3)
+						* data.get(6));
 
-		res.put(7, get(0) * get(6) * get(11) - get(0) * get(7) * get(10)
-				- get(4) * get(2) * get(11) + get(4) * get(3) * get(10)
-				+ get(8) * get(2) * get(7) - get(8) * get(3) * get(6));
+		res.data.put(
+				7,
+				data.get(0) * data.get(6) * data.get(11) - data.get(0)
+						* data.get(7) * data.get(10) - data.get(4)
+						* data.get(2) * data.get(11) + data.get(4)
+						* data.get(3) * data.get(10) + data.get(8)
+						* data.get(2) * data.get(7) - data.get(8) * data.get(3)
+						* data.get(6));
 
-		res.put(11, -get(0) * get(5) * get(11) + get(0) * get(7) * get(9)
-				+ get(4) * get(1) * get(11) - get(4) * get(3) * get(9) - get(8)
-				* get(1) * get(7) + get(8) * get(3) * get(5));
+		res.data.put(
+				11,
+				-data.get(0) * data.get(5) * data.get(11) + data.get(0)
+						* data.get(7) * data.get(9) + data.get(4) * data.get(1)
+						* data.get(11) - data.get(4) * data.get(3)
+						* data.get(9) - data.get(8) * data.get(1) * data.get(7)
+						+ data.get(8) * data.get(3) * data.get(5));
 
-		res.put(15, get(0) * get(5) * get(10) - get(0) * get(6) * get(9)
-				- get(4) * get(1) * get(10) + get(4) * get(2) * get(9) + get(8)
-				* get(1) * get(6) - get(8) * get(2) * get(5));
+		res.data.put(
+				15,
+				data.get(0) * data.get(5) * data.get(10) - data.get(0)
+						* data.get(6) * data.get(9) - data.get(4) * data.get(1)
+						* data.get(10) + data.get(4) * data.get(2)
+						* data.get(9) + data.get(8) * data.get(1) * data.get(6)
+						- data.get(8) * data.get(2) * data.get(5));
 
-		float det = get(0) * res.get(0) + get(1) * res.get(4) + get(2)
-				* res.get(8) + get(3) * res.get(12);
+		float det = data.get(0) * res.data.get(0) + data.get(1)
+				* res.data.get(4) + data.get(2) * res.data.get(8) + data.get(3)
+				* res.data.get(12);
 
 		if (det == 0) {
 			throw new IllegalArgumentException("Invert det=0 mat\n");
@@ -208,14 +258,14 @@ public final class Matrix4 {
 		det = 1.0f / det;
 
 		for (int i = 0; i < 16; i++)
-			res.put(i, res.get(i) * (det));
+			res.data.put(i, res.data.get(i) * (det));
 		return res;
 	}
 
 	private final void swap(int a, int b) {
-		float v = get(a);
-		put(a, get(b));
-		put(b, v);
+		float v = data.get(a);
+		data.put(a, data.get(b));
+		data.put(b, v);
 	}
 
 	public Matrix4 transposeInPlace() {
@@ -240,13 +290,13 @@ public final class Matrix4 {
 	}
 
 	public Matrix4 makeMatrix3() {
-		put(3, 0);
-		put(7, 0);
-		put(11, 0);
-		put(12, 0);
-		put(13, 0);
-		put(14, 0);
-		put(15, 1);
+		data.put(3, 0);
+		data.put(7, 0);
+		data.put(11, 0);
+		data.put(12, 0);
+		data.put(13, 0);
+		data.put(14, 0);
+		data.put(15, 1);
 		return this;
 	}
 
@@ -260,6 +310,22 @@ public final class Matrix4 {
 
 	public Matrix4 setScale(float x, float y, float z) {
 		return SpecialMatrix.scale(this.makeIdentity(), x, y, z);
+	}
+
+	public Matrix4 postMultiplyScale(final Vector s) {
+		if (s.dimension() != 3)
+			throw new IllegalArgumentException(
+					"Scaling only allowed by 3D vectors.");
+		return postMultiplyScale(s.get(0), s.get(1), s.get(2));
+	}
+
+	public Matrix4 postMultiplyScale(float x, float y, float z) {
+		for (int n = 0; n < 12; n += 4) {
+			data.put(n, data.get(n) * x);
+			data.put(n + 1, data.get(n + 1) * y);
+			data.put(n + 2, data.get(n + 2) * z);
+		}
+		return this;
 	}
 
 	public Matrix4 setAxisAngle(final float angle, final Vector a) {
@@ -315,18 +381,26 @@ public final class Matrix4 {
 	}
 
 	public Matrix4 preMultiplyTransform(float x, float y, float z) {
-		put(12, get(0) * x + get(4) * y + get(8) * z + get(12));
-		put(13, get(1) * x + get(5) * y + get(9) * z + get(13));
-		put(14, get(2) * x + get(6) * y + get(10) * z + get(14));
-		put(15, get(3) * x + get(7) * y + get(11) * z + get(15));
+		data.put(
+				12,
+				data.get(0) * x + data.get(4) * y + data.get(8) * z
+						+ data.get(12));
+		data.put(
+				13,
+				data.get(1) * x + data.get(5) * y + data.get(9) * z
+						+ data.get(13));
+		data.put(14, data.get(2) * x + data.get(6) * y + data.get(10) * z
+				+ data.get(14));
+		data.put(15, data.get(3) * x + data.get(7) * y + data.get(11) * z
+				+ data.get(15));
 		return this;
 	}
 
 	public Matrix4 preMultiplyTransform(float x, float y) {
-		put(12, get(0) * x + get(4) * y + get(12));
-		put(13, get(1) * x + get(5) * y + get(13));
-		put(14, get(2) * x + get(6) * y + get(14));
-		put(15, get(3) * x + get(7) * y + get(15));
+		data.put(12, data.get(0) * x + data.get(4) * y + data.get(12));
+		data.put(13, data.get(1) * x + data.get(5) * y + data.get(13));
+		data.put(14, data.get(2) * x + data.get(6) * y + data.get(14));
+		data.put(15, data.get(3) * x + data.get(7) * y + data.get(15));
 		return this;
 	}
 
@@ -344,7 +418,8 @@ public final class Matrix4 {
 				res.append('\n');
 			for (Matrix4 m : show)
 				res.append(String.format("%+2.8f %+2.8f %+2.8f %+2.8f    ",
-						m.get(i), m.get(i + 4), m.get(i + 8), m.get(i + 12)));
+						m.data.get(i), m.data.get(i + 4), m.data.get(i + 8),
+						m.data.get(i + 12)));
 		}
 		return res.toString();
 	}

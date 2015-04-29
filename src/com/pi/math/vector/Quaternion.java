@@ -82,7 +82,7 @@ public class Quaternion {
 		return lhs;
 	}
 
-	public static Vector slerp(Vector from, Vector to, float t) {
+	public static <T extends Vector> T slerp(T from, Vector to, float t) {
 		checkDim(from);
 		checkDim(to);
 		float cosTheta = from.dot(to);
@@ -106,6 +106,7 @@ public class Quaternion {
 			scale1 = (float) Math.sin(theta * t) / sinTheta;
 		}
 
-		return from.linearComb(scale0, to, scale1);
+		from.linearComb(scale0, to, scale1);
+		return from;
 	}
 }
