@@ -159,6 +159,20 @@ public abstract class Vector {
 		return code;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder res = new StringBuilder(getClass().getSimpleName());
+		res.append('[');
+		final int dim = dimension();
+		for (int i = 0; i < dim; i++) {
+			if (i > 0)
+				res.append(',');
+			res.append(get(i));
+		}
+		res.append(']');
+		return res.toString();
+	}
+
 	/**
 	 * Spherical linear interpolation from a to b, at time Vector in [0, 1]
 	 */
