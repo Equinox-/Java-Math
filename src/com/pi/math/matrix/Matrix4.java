@@ -15,15 +15,11 @@ public final class Matrix4 {
 	private final FloatBuffer data;
 
 	public Matrix4() {
-		this.data = BufferProvider.createFloatBuffer(16);
+		this(BufferProvider.createFloatBuffer(16), 0);
 	}
 
 	public Matrix4(ByteBuffer f, int offset) {
-		int ops = f.position();
-		f.position(offset);
-		this.data = f.asFloatBuffer();
-		this.data.limit(16);
-		f.position(ops);
+		this(((ByteBuffer) f.position(offset)).asFloatBuffer(), 0);
 	}
 
 	public Matrix4(FloatBuffer f, int offset) {
