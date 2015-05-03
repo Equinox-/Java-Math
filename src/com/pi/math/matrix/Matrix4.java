@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import com.pi.math.BufferProvider;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff3;
+import com.pi.math.vector.VectorBuff4;
 
 public final class Matrix4 {
 	private static final float[] ZERO = new float[16];
@@ -13,6 +14,9 @@ public final class Matrix4 {
 			0, 0, 0, 0, 1 };
 
 	private final FloatBuffer data;
+
+	public final VectorBuff4[] colVec4;
+	public final VectorBuff3[] colVec3;
 
 	public Matrix4() {
 		this(BufferProvider.createFloatBuffer(16), 0);
@@ -28,6 +32,13 @@ public final class Matrix4 {
 		this.data = f.slice();
 		this.data.limit(16);
 		f.position(ops);
+
+		colVec4 = new VectorBuff4[4];
+		colVec3 = new VectorBuff3[4];
+		for (int i = 0; i < 4; i++) {
+			colVec4[i] = new VectorBuff4(this.data, 4 * i);
+			colVec3[i] = new VectorBuff3(this.data, 4 * i);
+		}
 	}
 
 	public void zero() {
@@ -109,6 +120,22 @@ public final class Matrix4 {
 
 	public Vector transform3(Vector output, final Vector input) {
 		for (int k = 0; k < output.dimension(); k++)
+			output.set(k,
+					data.get(k) * input.get(0) + data.get(4 + k) * input.get(1)
+							+ data.get(8 + k) * input.get(2));
+		return output;
+	}
+
+	public VectorBuff3 transform4(VectorBuff3 output, final VectorBuff3 input) {
+		for (int k = 0; k < 3; k++)
+			output.set(k,
+					data.get(k) * input.get(0) + data.get(4 + k) * input.get(1)
+							+ data.get(8 + k) * input.get(2) + data.get(12 + k));
+		return output;
+	}
+
+	public VectorBuff3 transform3(VectorBuff3 output, final VectorBuff3 input) {
+		for (int k = 0; k < 3; k++)
 			output.set(k,
 					data.get(k) * input.get(0) + data.get(4 + k) * input.get(1)
 							+ data.get(8 + k) * input.get(2));
