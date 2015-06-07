@@ -335,6 +335,22 @@ public final class Matrix4 {
 		return SpecialMatrix.scale(this.makeIdentity(), x, y, z);
 	}
 
+	public Matrix4 preMultiplyScale(final Vector s) {
+		if (s.dimension() != 3)
+			throw new IllegalArgumentException(
+					"Scaling only allowed by 3D vectors.");
+		return preMultiplyScale(s.get(0), s.get(1), s.get(2));
+	}
+
+	public Matrix4 preMultiplyScale(float x, float y, float z) {
+		for (int n = 0; n < 3; n++) {
+			data.put(n, data.get(n) * x);
+			data.put(n + 4, data.get(n + 4) * y);
+			data.put(n + 8, data.get(n + 8) * z);
+		}
+		return this;
+	}
+
 	public Matrix4 postMultiplyScale(final Vector s) {
 		if (s.dimension() != 3)
 			throw new IllegalArgumentException(
