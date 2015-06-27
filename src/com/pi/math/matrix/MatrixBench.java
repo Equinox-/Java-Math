@@ -1,6 +1,6 @@
 package com.pi.math.matrix;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class MatrixBench {
 	public static float randf() {
 		return (float) Math.random();

@@ -144,9 +144,9 @@ public abstract class Matrix<E extends Matrix<?>> {
 
 	public abstract E multiplyInto(Matrix m);
 
-	public abstract <R extends Matrix> R invertInto(R m);
+	public abstract <R extends Matrix<R>> R invertInto(R m);
 
-	public <R extends Matrix> R copyTo(R m) {
+	public <R extends Matrix<R>> R copyTo(R m) {
 		if (m.rows == rows) {
 			if (m.columns > columns) {
 				// Copying into more columns. Make identity, then copy.

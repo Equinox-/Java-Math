@@ -5,6 +5,7 @@ import com.pi.math.vector.Quaternion;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff4;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public final class SpecialMatrix {
 	public static Transform axisAngle(final Transform m, final float angle, final float x, final float y,
 			final float z) {
@@ -86,13 +87,13 @@ public final class SpecialMatrix {
 		final float width = right - left, height = top - bottom, length = far - near;
 
 		m.makeZero();
-		m.set(0, near2 / width);
-		m.set(5, near2 / height);
-		m.set(8, (right + left) / width);
-		m.set(9, (top + bottom) / height);
-		m.set(10, -(far + near) / length);
-		m.set(11, -1);
-		m.set(14, -near2 * far / length);
+		m.set(0, 0, near2 / width);
+		m.set(1, 1, near2 / height);
+		m.set(0, 2, (right + left) / width);
+		m.set(1, 2, (top + bottom) / height);
+		m.set(2, 2, -(far + near) / length);
+		m.set(3, 2, -1);
+		m.set(2, 3, -near2 * far / length);
 		return m;
 	}
 
@@ -101,13 +102,13 @@ public final class SpecialMatrix {
 		final float width = right - left, height = top - bottom, length = far - near;
 
 		m.makeZero();
-		m.set(0, 2 / width);
-		m.set(5, 2 / height);
-		m.set(10, -2 / length);
-		m.set(12, -(right + left) / width);
-		m.set(13, -(top + bottom) / height);
-		m.set(14, -(far + near) / length);
-		m.set(15, 1);
+		m.set(0, 0, 2 / width);
+		m.set(1, 1, 2 / height);
+		m.set(2, 2, -2 / length);
+		m.set(0, 3, -(right + left) / width);
+		m.set(1, 3, -(top + bottom) / height);
+		m.set(2, 3, -(far + near) / length);
+		m.set(3, 3, 1);
 		return m;
 	}
 
@@ -116,9 +117,7 @@ public final class SpecialMatrix {
 		VectorBuff4 tmpQuat = MathUtil.checkout(4);
 		Quaternion.fromEulerAngles(tmpQuat, eulerRot);
 		dest.setQuaternion(tmpQuat);
-		for (int k = 0; k < 3; k++)
-			for (int j = 0; j < 3; j++)
-				dest.set((k << 2) + j, dest.get((k << 2) + j) * scale.get(k));
+		dest.postMultiplyScale(scale);
 		SpecialMatrix.translation(dest, pos.get(0), pos.get(1), pos.get(2));
 		MathUtil.checkin(tmpQuat);
 		return dest;
@@ -130,17 +129,18 @@ public final class SpecialMatrix {
 		// First decompose the scale: grab the translation
 		src.copyTo(tmp);
 		// Decompose scale
-		pos.setV(tmp.get(12), tmp.get(13), tmp.get(14));
+		pos.setV(tmp.get(0, 3), tmp.get(1, 3), tmp.get(2, 3));
 		for (int l = 0; l < 3; l++) {
-			scale.set(l, (float) Math
-					.sqrt(tmp.get(l) * tmp.get(l) + tmp.get(4 + l) * tmp.get(4 + l) + tmp.get(8 + l) * tmp.get(8 + l)));
-			for (int k = 0; k <= 8; k += 4)
-				tmp.set(l + k, tmp.get(l + k) / scale.get(l));
+			scale.set(l, (float) Math.sqrt(
+					tmp.get(l, 0) * tmp.get(l, 0) + tmp.get(l, 1) * tmp.get(l, 1) + tmp.get(l, 2) * tmp.get(l, 2)));
+			for (int k = 0; k < 3; k++)
+				tmp.set(l, k, tmp.get(l, k) / scale.get(l));
 		}
 		// Decompose rotation. (This is finicky)
-		float tr = tmp.get(0) + tmp.get(5) + tmp.get(10);
+		float tr = tmp.get(0, 0) + tmp.get(1, 1) + tmp.get(2, 2);
 
 		VectorBuff4 quat = MathUtil.checkout(4);
+		// TODO FIX FOR GENERAL CASE
 		if (tr > 0) {
 			float S = (float) Math.sqrt(tr + 1.0) * 2; // S=4*qw
 			quat.setV(0.25f * S, (tmp.get(9) - tmp.get(9)) / S, (tmp.get(8) - tmp.get(2)) / S,

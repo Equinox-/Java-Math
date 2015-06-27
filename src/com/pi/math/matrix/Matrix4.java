@@ -6,7 +6,6 @@ import java.nio.FloatBuffer;
 import com.pi.math.BufferProvider;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff3;
-import com.pi.math.vector.VectorBuff4;
 
 @SuppressWarnings("rawtypes")
 public final class Matrix4 extends Transform<Matrix4> {
@@ -39,7 +38,7 @@ public final class Matrix4 extends Transform<Matrix4> {
 			dest.set(0,i, ai0 * b.get(0,0) + ai1 * b.get(0,1)
 					+ ai2 * b.get(0,2) + ai3 * b.get(0,3));
 			dest.set(1,i, ai0 * b.get(1,0) + ai1 * b.get(1,1)
-					+ ai2 * b.get(8 + 1) + ai3 * b.get(1,3));
+					+ ai2 * b.get(1,2) + ai3 * b.get(1,3));
 			dest.set(2,i, ai0 * b.get(2,0) + ai1 * b.get(2,1)
 					+ ai2 * b.get(2,2) + ai3 * b.get(2,3));
 			dest.set(3,i, ai0 * b.get(3,0) + ai1 * b.get(3,1)
@@ -93,7 +92,7 @@ public final class Matrix4 extends Transform<Matrix4> {
 
 	// Matrix operations
 	@Override
-	public <R extends Matrix> R invertInto(R res) {
+	public <R extends Matrix<R>> R invertInto(R res) {
 		res.set(0, get(5) * get(10) * get(15) - get(5)
 				* get(11) * get(14) - get(9) * get(6)
 				* get(15) + get(9) * get(7) * get(14)
