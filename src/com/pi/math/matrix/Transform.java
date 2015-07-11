@@ -36,9 +36,9 @@ public abstract class Transform<E extends Transform<?>> extends Matrix<E> {
 
 	public E preMultiplyScale(float x, float y, float z) {
 		for (int n = 0; n < 3; n++) {
-			set(n, get(n) * x);
-			set(n + 4, get(n + 4) * y);
-			set(n + 8, get(n + 8) * z);
+			set(n, 0, get(n, 0) * x);
+			set(n, 1, get(n, 1) * y);
+			set(n, 2, get(n, 2) * z);
 		}
 		return (E) this;
 	}
@@ -50,10 +50,10 @@ public abstract class Transform<E extends Transform<?>> extends Matrix<E> {
 	}
 
 	public E postMultiplyScale(float x, float y, float z) {
-		for (int n = 0; n < 12; n += 4) {
-			set(n, get(n) * x);
-			set(n + 1, get(n + 1) * y);
-			set(n + 2, get(n + 2) * z);
+		for (int n = 0; n < 3; n++) {
+			set(0, n, get(0, n) * x);
+			set(1, n, get(1, n) * y);
+			set(2, n, get(2, n) * z);
 		}
 		return (E) this;
 	}

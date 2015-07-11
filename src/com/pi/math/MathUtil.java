@@ -1,60 +1,27 @@
 package com.pi.math;
 
-import com.pi.math.vector.VectorBuff;
 import com.pi.math.vector.VectorBuff3;
 
 public class MathUtil {
 	public static final float EPSILON = .00001f;
 
-	// 1-4D vectors
-	private static final int[] VECTOR_HEAP_SIZE = new int[4];
-	private static final VectorBuff[][] VECTOR_HEAP = new VectorBuff[4][];
-	static {
-		for (int d = 0; d < VECTOR_HEAP.length; d++) {
-			VECTOR_HEAP[d] = new VectorBuff[d + 1 == 3 ? 128 : 16];
-			while (VECTOR_HEAP_SIZE[d] < VECTOR_HEAP[d].length)
-				VECTOR_HEAP[d][VECTOR_HEAP_SIZE[d]++] = VectorBuff.make(d + 1);
-		}
-	}
-
-	public static VectorBuff3 checkout3() {
-		return (VectorBuff3) checkout(3);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T extends VectorBuff> T checkout(int dim) {
-		if (dim <= 0 || dim > VECTOR_HEAP.length
-				|| VECTOR_HEAP_SIZE[dim - 1] <= 0)
-			return (T) VectorBuff.make(dim);
-		return (T) VECTOR_HEAP[dim - 1][--VECTOR_HEAP_SIZE[dim - 1]];
-	}
-
-	public static void checkin(VectorBuff v) {
-		int dim = v.dimension();
-		if (dim <= 0 || dim > VECTOR_HEAP.length
-				|| VECTOR_HEAP_SIZE[dim - 1] >= VECTOR_HEAP[dim - 1].length)
-			return;
-		VECTOR_HEAP[dim - 1][VECTOR_HEAP_SIZE[dim - 1]++] = v;
-	}
-
 	private static VectorBuff3 subtract(VectorBuff3 lhs, VectorBuff3 rhs) {
-		VectorBuff3 dest = MathUtil.checkout(3);
+		VectorBuff3 dest = Heap.checkout(3);
 		dest.linearComb(lhs, 1, rhs, -1);
 		return dest;
 	}
 
-	public static VectorBuff3 getPointOnRay(VectorBuff3 dest,
-			VectorBuff3 origin, VectorBuff3 normal, VectorBuff3 near) {
+	public static VectorBuff3 getPointOnRay(VectorBuff3 dest, VectorBuff3 origin, VectorBuff3 normal,
+			VectorBuff3 near) {
 		VectorBuff3 pointNormal = subtract(near, origin);
 		float distOnLine = pointNormal.dot(normal);
 		dest.linearComb(origin, 1, normal, distOnLine);
-		checkin(pointNormal);
+		Heap.checkin(pointNormal);
 		return dest;
 	}
 
-	public static VectorBuff3 rayIntersectsTriangle(VectorBuff3 dest,
-			VectorBuff3 O, VectorBuff3 D, VectorBuff3 v0, VectorBuff3 v1,
-			VectorBuff3 v2) {
+	public static VectorBuff3 rayIntersectsTriangle(VectorBuff3 dest, VectorBuff3 O, VectorBuff3 D, VectorBuff3 v0,
+			VectorBuff3 v1, VectorBuff3 v2) {
 		// Moller-Trumbore ray-triangle intersection algorithm
 		// http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 
@@ -67,8 +34,9 @@ public class MathUtil {
 			// Find vectors for two edges sharing V1
 			e1 = subtract(v1, v0);
 			e2 = subtract(v2, v0);
-			// Begin calculating determinant - also used to calculate u parameter
-			P = checkout(3);
+			// Begin calculating determinant - also used to calculate u
+			// parameter
+			P = Heap.checkout(3);
 			P.cross(D, e2);
 
 			// if determinant is near zero, ray lies in plane of triangle
@@ -87,7 +55,7 @@ public class MathUtil {
 				return null;
 
 			// Prepare to test v parameter
-			Q = checkout(3);
+			Q = Heap.checkout(3);
 			Q.cross(T, e1);
 
 			// Calculate V parameter and test bound
@@ -105,28 +73,26 @@ public class MathUtil {
 			// No hit, no win
 			return null;
 		} finally {
-			checkin(e1);
-			checkin(e2);
-			checkin(P);
+			Heap.checkin(e1);
+			Heap.checkin(e2);
+			Heap.checkin(P);
 			if (T != null)
-				checkin(T);
+				Heap.checkin(T);
 			if (Q != null)
-				checkin(Q);
+				Heap.checkin(Q);
 		}
 	}
 
-	public static boolean rayIntersectsSphere(VectorBuff3 O, VectorBuff3 D,
-			VectorBuff3 center, float radius) {
+	public static boolean rayIntersectsSphere(VectorBuff3 O, VectorBuff3 D, VectorBuff3 center, float radius) {
 		VectorBuff3 oMC = subtract(O, center);
 		float b = D.dot(oMC);
 		float c = D.mag2() * (oMC.mag2() - radius * radius);
-		checkin(oMC);
+		Heap.checkin(oMC);
 		return (b * b - c) > -MathUtil.EPSILON;
 	}
 
-	public static boolean rayIntersectsBox(VectorBuff3 O, VectorBuff3 D,
-			VectorBuff3 min, VectorBuff3 max) {
-		VectorBuff3 maxT = checkout(3);
+	public static boolean rayIntersectsBox(VectorBuff3 O, VectorBuff3 D, VectorBuff3 min, VectorBuff3 max) {
+		VectorBuff3 maxT = Heap.checkout(3);
 		try {
 			boolean inside = true;
 			for (int i = 0; i < maxT.dimension(); i++)
@@ -170,7 +136,7 @@ public class MathUtil {
 			}
 			return true; // ray hits box
 		} finally {
-			checkin(maxT);
+			Heap.checkin(maxT);
 		}
 	}
 }

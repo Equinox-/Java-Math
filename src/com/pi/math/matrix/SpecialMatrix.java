@@ -1,6 +1,6 @@
 package com.pi.math.matrix;
 
-import com.pi.math.MathUtil;
+import com.pi.math.Heap;
 import com.pi.math.vector.Quaternion;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff4;
@@ -114,12 +114,12 @@ public final class SpecialMatrix {
 
 	public static Transform toCompleteTransform(Transform dest, final Vector eulerRot, final Vector scale,
 			final Vector pos) {
-		VectorBuff4 tmpQuat = MathUtil.checkout(4);
+		VectorBuff4 tmpQuat = Heap.checkout(4);
 		Quaternion.fromEulerAngles(tmpQuat, eulerRot);
 		dest.setQuaternion(tmpQuat);
 		dest.postMultiplyScale(scale);
 		SpecialMatrix.translation(dest, pos.get(0), pos.get(1), pos.get(2));
-		MathUtil.checkin(tmpQuat);
+		Heap.checkin(tmpQuat);
 		return dest;
 	}
 
@@ -139,7 +139,7 @@ public final class SpecialMatrix {
 		// Decompose rotation. (This is finicky)
 		float tr = tmp.get(0, 0) + tmp.get(1, 1) + tmp.get(2, 2);
 
-		VectorBuff4 quat = MathUtil.checkout(4);
+		VectorBuff4 quat = Heap.checkout(4);
 		// TODO FIX FOR GENERAL CASE
 		if (tr > 0) {
 			float S = (float) Math.sqrt(tr + 1.0) * 2; // S=4*qw

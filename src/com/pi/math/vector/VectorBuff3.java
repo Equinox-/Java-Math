@@ -13,6 +13,18 @@ public class VectorBuff3 extends VectorBuff {
 		this(BufferProvider.createFloatBuffer(3), 0);
 	}
 
+	@Override
+	public VectorBuff3 setV(float... f) {
+		super.setV(f);
+		return this;
+	}
+
+	@Override
+	public VectorBuff3 set(VectorBuff v) {
+		super.set(v);
+		return this;
+	}
+
 	public VectorBuff3 add(VectorBuff3 r) {
 		data.put(0, data.get(0) + r.data.get(0));
 		data.put(1, data.get(1) + r.data.get(1));
@@ -20,7 +32,7 @@ public class VectorBuff3 extends VectorBuff {
 		return this;
 	}
 
-	public VectorBuff3 subtract(VectorBuff3 r) {
+	public VectorBuff3 sub(VectorBuff3 r) {
 		data.put(0, data.get(0) - r.data.get(0));
 		data.put(1, data.get(1) - r.data.get(1));
 		data.put(2, data.get(2) - r.data.get(2));
@@ -51,16 +63,14 @@ public class VectorBuff3 extends VectorBuff {
 	}
 
 	public float dot(VectorBuff3 v) {
-		return data.get(0) * v.data.get(0) + data.get(1) * v.data.get(1)
-				+ data.get(2) * v.data.get(2);
+		return data.get(0) * v.data.get(0) + data.get(1) * v.data.get(1) + data.get(2) * v.data.get(2);
 	}
 
 	public VectorBuff3 linearComb(float aC, VectorBuff3 b, float bC) {
 		return linearComb(this, aC, b, bC);
 	}
 
-	public VectorBuff3 linearComb(VectorBuff3 a, float aC, VectorBuff3 b,
-			float bC) {
+	public VectorBuff3 linearComb(VectorBuff3 a, float aC, VectorBuff3 b, float bC) {
 		data.put(0, aC * a.data.get(0) + bC * b.data.get(0));
 		data.put(1, aC * a.data.get(1) + bC * b.data.get(1));
 		data.put(2, aC * a.data.get(2) + bC * b.data.get(2));

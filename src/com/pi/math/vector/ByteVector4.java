@@ -14,6 +14,11 @@ public class ByteVector4 extends ByteVector {
 		super(data, offset, 4);
 	}
 
+	public ByteVector4(float r, float g, float b, float a) {
+		this();
+		setV(r, g, b, a);
+	}
+
 	public ByteVector4 set(int r, int g, int b, int a) {
 		setB(0, r);
 		setB(1, g);
@@ -23,8 +28,7 @@ public class ByteVector4 extends ByteVector {
 	}
 
 	public ByteVector4 set(float r, float g, float b, float a) {
-		return set((int) (r * 255), (int) (g * 255), (int) (b * 255),
-				(int) (a * 255));
+		return set((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
 	}
 
 	public ByteVector4 set(int r, int g, int b) {
@@ -36,8 +40,7 @@ public class ByteVector4 extends ByteVector {
 	}
 
 	public ByteVector4 set(int argb) {
-		return set((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF,
-				(argb >> 24) & 0xFF);
+		return set((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, (argb >> 24) & 0xFF);
 	}
 
 	public ByteVector4 set(Color src) {

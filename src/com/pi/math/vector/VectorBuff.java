@@ -46,7 +46,10 @@ public class VectorBuff extends Vector {
 		check(v);
 		data.position(0);
 		v.data.position(0);
+		int ol = v.data.limit();
+		v.data.limit(Math.min(dimension, v.dimension));
 		data.put(v.data);
+		v.data.limit(ol);
 		data.position(0);
 		v.data.position(0);
 		return this;

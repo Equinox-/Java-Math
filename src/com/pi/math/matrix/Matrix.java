@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import com.pi.math.BufferProvider;
+import com.pi.math.Heap;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff;
 
@@ -57,6 +58,18 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return cols[i];
 	}
 
+	public final VectorBuff getRow(int i, VectorBuff v) {
+		for (int k = 0; k < Math.min(v.dimension(), columns); k++)
+			v.set(k, get(i, k));
+		return v;
+	}
+
+	public final VectorBuff setRow(int i, VectorBuff v) {
+		for (int k = 0; k < Math.min(v.dimension(), columns); k++)
+			set(i, k, v.get(k));
+		return v;
+	}
+
 	public final int columns() {
 		return columns;
 	}
@@ -75,6 +88,10 @@ public abstract class Matrix<E extends Matrix<?>> {
 
 	public final void set(int r, int c, float v) {
 		cols[c].set(r, v);
+	}
+
+	public final void mod(int r, int c, float v) {
+		cols[c].set(r, cols[c].get(r) + v);
 	}
 
 	public final float get(int n) {
@@ -124,11 +141,26 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return (E) this;
 	}
 
-	public final E multiply(float af) {
+	public final E multiply(Matrix a, float af) {
 		for (int c = 0; c < columns; c++)
 			for (int r = 0; r < rows; r++)
-				set(r, c, get(r, c) * af);
+				set(r, c, a.get(r, c) * af);
 		return (E) this;
+	}
+
+	public final E multiply(float af) {
+		return multiply(this, af);
+	}
+
+	public final E add(Matrix a, Matrix b) {
+		for (int c = 0; c < columns; c++)
+			for (int r = 0; r < rows; r++)
+				set(r, c, a.get(r, c) + b.get(r, c));
+		return (E) this;
+	}
+
+	public final E add(Matrix b) {
+		return add(this, b);
 	}
 
 	public final E linearComb(float af, Matrix b, float bf) {
@@ -146,7 +178,12 @@ public abstract class Matrix<E extends Matrix<?>> {
 
 	public abstract <R extends Matrix<R>> R invertInto(R m);
 
-	public <R extends Matrix<R>> R copyTo(R m) {
+	public E set(E m) {
+		m.copyTo(this);
+		return (E) this;
+	}
+
+	public <R extends Matrix> R copyTo(R m) {
 		if (m.rows == rows) {
 			if (m.columns > columns) {
 				// Copying into more columns. Make identity, then copy.
@@ -180,6 +217,14 @@ public abstract class Matrix<E extends Matrix<?>> {
 	}
 
 	public abstract <R extends Vector> R transform(final R output, Vector input);
+
+	public <R extends Vector> R transform(final R input) {
+		VectorBuff tmp = Heap.checkout(input.dimension());
+		transform(tmp, input);
+		input.set(tmp);
+		Heap.checkin(tmp);
+		return input;
+	}
 
 	public FloatBuffer accessor() {
 		access.position(0);

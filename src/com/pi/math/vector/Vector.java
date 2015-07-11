@@ -16,6 +16,10 @@ public abstract class Vector {
 
 	public abstract void set(int d, float r);
 
+	public void mod(int d, float f) {
+		set(d, get(d) + f);
+	}
+
 	public abstract int dimension();
 
 	public final void check(Vector t) {
@@ -23,6 +27,28 @@ public abstract class Vector {
 			if (dimension() != t.dimension())
 				throw new IllegalArgumentException("Mismatch Dimensions");
 		}
+	}
+
+	public Vector scale(float f, Vector v) {
+		check(v);
+		for (int i = 0; i < dimension(); i++)
+			set(i, f * v.get(i));
+		return this;
+	}
+
+	public Vector negate(Vector v) {
+		check(v);
+		for (int i = 0; i < dimension(); i++)
+			set(i, -v.get(i));
+		return this;
+	}
+
+	public Vector sub(Vector lhs, Vector rhs) {
+		return linearComb(lhs, 1, rhs, -1);
+	}
+
+	public Vector add(Vector lhs, Vector rhs) {
+		return linearComb(lhs, 1, rhs, 1);
 	}
 
 	public Vector add(Vector r) {
@@ -63,6 +89,10 @@ public abstract class Vector {
 		return r;
 	}
 
+	public final Vector normalize(Vector v) {
+		return linearComb(0, v, FastMath.Q_rsqrt(v.mag2()));
+	}
+
 	public final Vector normalize() {
 		return multiply(FastMath.Q_rsqrt(mag2()));
 	}
@@ -97,8 +127,7 @@ public abstract class Vector {
 	}
 
 	public final float angle(Vector v) {
-		return (float) Math.acos(dot(v) * FastMath.Q_rsqrt(mag2())
-				* FastMath.Q_rsqrt(v.mag2()));
+		return (float) Math.acos(dot(v) * FastMath.Q_rsqrt(mag2()) * FastMath.Q_rsqrt(v.mag2()));
 	}
 
 	public Vector linearComb(float aC, Vector b, float bC) {
@@ -119,20 +148,15 @@ public abstract class Vector {
 
 	public static Vector crossProduct(Vector dest, Vector u, Vector v) {
 		if (u.dimension() != 3 || v.dimension() != 3 || dest.dimension() != 3)
-			throw new IllegalArgumentException(
-					"Cross product is only valid in three dimensions");
-		return dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
-				(u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
+			throw new IllegalArgumentException("Cross product is only valid in three dimensions");
+		return dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)), (u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
 	}
 
-	public static VectorBuff3 crossProduct(VectorBuff3 dest, VectorBuff3 u,
-			VectorBuff3 v) {
+	public static VectorBuff3 crossProduct(VectorBuff3 dest, VectorBuff3 u, VectorBuff3 v) {
 		if (u.dimension() != 3 || v.dimension() != 3 || dest.dimension() != 3)
-			throw new IllegalArgumentException(
-					"Cross product is only valid in three dimensions");
-		dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)),
-				(u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
+			throw new IllegalArgumentException("Cross product is only valid in three dimensions");
+		dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)), (u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
 		return dest;
 	}
@@ -181,8 +205,7 @@ public abstract class Vector {
 		a.check(dest);
 
 		final float angle = a.angle(b);
-		final float weightA = (float) (Math.sin((1 - t) * angle) / Math
-				.sin(angle));
+		final float weightA = (float) (Math.sin((1 - t) * angle) / Math.sin(angle));
 		final float weightB = (float) (Math.sin(t * angle) / Math.sin(angle));
 		return dest.linearComb(a, weightA, b, weightB);
 	}
