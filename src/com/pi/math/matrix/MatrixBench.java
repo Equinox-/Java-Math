@@ -31,32 +31,48 @@ public class MatrixBench {
 
 	public static void bench(Class<? extends Matrix> genA, Class<? extends Matrix> genB) {
 		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).multiplyInto(rand(genB));
+			try {
+				long begin = System.nanoTime();
+				for (int k = 0; k < COUNT; k++) {
+					Matrix res = rand(genA).multiplyInto(rand(genB));
+				}
+				System.out.println(ttl(genA, genB, "multiply") + (System.nanoTime() - begin) / COUNT + " ns/op");
+			} catch (Exception e) {
+				System.out.println(ttl(genA, genB, "multiply") + "failure");
 			}
-			System.out.println(ttl(genA, genB, "multiply") + (System.nanoTime() - begin) / COUNT + " ns/op");
 		}
 		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).linearComb(randf(), rand(genB), randf());
+			try {
+				long begin = System.nanoTime();
+				for (int k = 0; k < COUNT; k++) {
+					Matrix res = rand(genA).linearComb(randf(), rand(genB), randf());
+				}
+				System.out.println(ttl(genA, genB, "lincom") + (System.nanoTime() - begin) / COUNT + " ns/op");
+			} catch (Exception e) {
+				System.out.println(ttl(genA, genB, "lincom") + "failure");
 			}
-			System.out.println(ttl(genA, genB, "lincom") + (System.nanoTime() - begin) / COUNT + " ns/op");
 		}
 		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).invertInto(rand(genB));
+			try {
+				long begin = System.nanoTime();
+				for (int k = 0; k < COUNT; k++) {
+					Matrix res = rand(genA).invertInto(rand(genB));
+				}
+				System.out.println(ttl(genA, genB, "invert") + (System.nanoTime() - begin) / COUNT + " ns/op");
+			} catch (Exception e) {
+				System.out.println(ttl(genA, genB, "invert") + "failure");
 			}
-			System.out.println(ttl(genA, genB, "invert") + (System.nanoTime() - begin) / COUNT + " ns/op");
 		}
 		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).copyTo(rand(genB));
+			try {
+				long begin = System.nanoTime();
+				for (int k = 0; k < COUNT; k++) {
+					Matrix res = rand(genA).copyTo(rand(genB));
+				}
+				System.out.println(ttl(genA, genB, "copy") + (System.nanoTime() - begin) / COUNT + " ns/op");
+			} catch (Exception e) {
+				System.out.println(ttl(genA, genB, "copy") + "failure");
 			}
-			System.out.println(ttl(genA, genB, "copy") + (System.nanoTime() - begin) / COUNT + " ns/op");
 		}
 	}
 
@@ -93,6 +109,30 @@ public class MatrixBench {
 
 	public static void main(String[] args) {
 		bench(Matrix4.class);
+		System.out.println();
 		bench(Matrix4.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix3.class);
+		System.out.println();
+		System.out.println();
+		bench(Matrix3.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix3.class);
+		System.out.println();
+		System.out.println();
+		bench(Matrix34.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix3.class);
+		System.out.println();
 	}
 }

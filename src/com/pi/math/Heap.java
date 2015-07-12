@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.pi.math.matrix.Matrix;
 import com.pi.math.matrix.Matrix3;
+import com.pi.math.matrix.Matrix34;
 import com.pi.math.matrix.Matrix4;
 import com.pi.math.vector.VectorBuff;
 import com.pi.math.vector.VectorBuff3;
@@ -84,6 +85,8 @@ public class Heap {
 			return new Matrix4();
 		case 1:
 			return new Matrix3();
+		case 2:
+			return new Matrix34();
 		default:
 			return null;
 		}
@@ -123,6 +126,10 @@ public class Heap {
 
 	public static Matrix3 checkoutM3() {
 		return (Matrix3) checkoutM(1);
+	}
+
+	public static Matrix34 checkoutM34() {
+		return (Matrix34) checkoutM(2);
 	}
 
 	public static void checkin(Matrix... vs) {

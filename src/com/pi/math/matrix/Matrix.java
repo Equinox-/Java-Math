@@ -174,9 +174,30 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return (E) this;
 	}
 
-	public abstract E multiplyInto(Matrix m);
+	public E multiplyInto(Matrix m) {
+		return mul(this, m);
+	}
 
-	public abstract <R extends Matrix<R>> R invertInto(R m);
+	public final E mul(Matrix lhs, Matrix rhs) {
+		if (lhs instanceof Matrix4 || rhs instanceof Matrix4) {
+			MatMulAlgs.mul44(this, lhs, rhs);
+		} else if (lhs instanceof Matrix34 || rhs instanceof Matrix34) {
+			MatMulAlgs.mul34(this, lhs, rhs);
+		} else {
+			MatMulAlgs.mul33(this, lhs, rhs);
+		}
+		return (E) this;
+	}
+
+	public final <R extends Matrix<R>> R invertInto(R m) {
+		if (this instanceof Matrix3)
+			MatInvAlgs.inv33(m, this);
+		else if (this instanceof Matrix34)
+			MatInvAlgs.inv34(m, this);
+		else
+			MatInvAlgs.inv44(m, this);
+		return m;
+	}
 
 	public E set(E m) {
 		m.copyTo(this);
@@ -229,5 +250,34 @@ public abstract class Matrix<E extends Matrix<?>> {
 	public FloatBuffer accessor() {
 		access.position(0);
 		return access;
+	}
+
+	// Stringification
+	public static String toString(Matrix... show) {
+		StringBuilder res = new StringBuilder();
+		int mxk = 0;
+		for (Matrix m : show)
+			mxk = Math.max(mxk, m.rows());
+
+		for (int i = 0; i < mxk; i++) {
+			if (i > 0)
+				res.append('\n');
+			for (Matrix m : show) {
+				if (i < m.rows()) {
+					for (int c = 0; c < m.columns(); c++)
+						res.append(String.format("%+2.8f ", m.get(i, c)));
+				} else {
+					for (int c = 0; c < m.columns(); c++)
+						res.append("            ");
+				}
+				res.append("      ");
+			}
+		}
+		return res.toString();
+	}
+
+	@Override
+	public String toString() {
+		return toString(this);
 	}
 }
