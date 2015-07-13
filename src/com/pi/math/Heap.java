@@ -61,6 +61,8 @@ public class Heap {
 
 	public static void checkin(VectorBuff... vs) {
 		for (VectorBuff v : vs) {
+			if (v == null)
+				continue;
 			int dim = v.dimension();
 			if (dim <= 0 || dim > VECTOR_HEAP.length || VECTOR_HEAP_SIZE[dim - 1] >= VECTOR_HEAP[dim - 1].length)
 				continue;
@@ -134,22 +136,26 @@ public class Heap {
 
 	public static void checkin(Matrix... vs) {
 		for (Matrix v : vs) {
-			if (v instanceof Matrix4)
+			if (v == null)
+				continue;
+			else if (v instanceof Matrix4)
 				checkin(v, 0);
 			else if (v instanceof Matrix3)
 				checkin(v, 1);
+			else if (v instanceof Matrix34)
+				checkin(v, 2);
 		}
 	}
 
 	public static void printHeapDebug() {
-		System.out.print(" - Vector Heaps \t");
-		for (int k = 0; k < VECTOR_HEAP.length; k++)
-			System.out.print(VECTOR_HEAP_SIZE[k] + "\t");
-		System.out.println();
-		System.out.print(" - Matrix Heaps \t");
-		for (int k = 0; k < MATRIX_HEAP.length; k++)
-			System.out.print(MATRIX_HEAP_SIZE[k] + "\t");
-		System.out.println();
+		// System.out.print(" - Vector Heaps \t");
+		// for (int k = 0; k < VECTOR_HEAP.length; k++)
+		// System.out.print(VECTOR_HEAP_SIZE[k] + "\t");
+		// System.out.println();
+		// System.out.print(" - Matrix Heaps \t");
+		// for (int k = 0; k < MATRIX_HEAP.length; k++)
+		// System.out.print(MATRIX_HEAP_SIZE[k] + "\t");
+		// System.out.println();
 		if (HEAP_WATCH) {
 			for (Entry<Integer, Data> e : owner.entrySet()) {
 				System.err.println(e.getValue().o.getClass().getSimpleName());

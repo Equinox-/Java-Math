@@ -65,6 +65,14 @@ public abstract class Vector {
 		return this;
 	}
 
+	public Vector scale(float f) {
+		return multiply(f);
+	}
+	
+	public Vector scaleAdd(float s, Vector t1, Vector t2) {
+		return linearComb(t1, s, t2, 1);
+	}
+
 	public Vector multiply(float f) {
 		for (int i = 0; i < dimension(); i++)
 			set(i, get(i) * f);

@@ -34,7 +34,7 @@ public class MatrixBench {
 			try {
 				long begin = System.nanoTime();
 				for (int k = 0; k < COUNT; k++) {
-					Matrix res = rand(genA).multiplyInto(rand(genB));
+					Matrix res = rand(genA).preMul(rand(genB));
 				}
 				System.out.println(ttl(genA, genB, "multiply") + (System.nanoTime() - begin) / COUNT + " ns/op");
 			} catch (Exception e) {

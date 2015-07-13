@@ -64,10 +64,16 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return v;
 	}
 
-	public final VectorBuff setRow(int i, VectorBuff v) {
+	public final E setRow(int i, VectorBuff v) {
 		for (int k = 0; k < Math.min(v.dimension(), columns); k++)
 			set(i, k, v.get(k));
-		return v;
+		return (E) this;
+	}
+
+	public final E setRow(int i, float... v) {
+		for (int k = 0; k < Math.min(v.length, columns); k++)
+			set(i, k, v[k]);
+		return (E) this;
 	}
 
 	public final int columns() {
@@ -174,10 +180,23 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return (E) this;
 	}
 
-	public E multiplyInto(Matrix m) {
+	/**
+	 * this = m * this
+	 */
+	public E preMul(Matrix m) {
+		return mul(m, this);
+	}
+
+	/**
+	 * this = this * m
+	 */
+	public E postMul(Matrix m) {
 		return mul(this, m);
 	}
 
+	/**
+	 * this = lhs * rhs
+	 */
 	public final E mul(Matrix lhs, Matrix rhs) {
 		if (lhs instanceof Matrix4 || rhs instanceof Matrix4) {
 			MatMulAlgs.mul44(this, lhs, rhs);
@@ -186,6 +205,11 @@ public abstract class Matrix<E extends Matrix<?>> {
 		} else {
 			MatMulAlgs.mul33(this, lhs, rhs);
 		}
+		return (E) this;
+	}
+
+	public final E inverseOf(Matrix a) {
+		a.invertInto(this);
 		return (E) this;
 	}
 
@@ -199,7 +223,7 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return m;
 	}
 
-	public E set(E m) {
+	public E set(Matrix m) {
 		m.copyTo(this);
 		return (E) this;
 	}
