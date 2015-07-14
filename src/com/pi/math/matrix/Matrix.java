@@ -254,8 +254,8 @@ public abstract class Matrix<E extends Matrix<?>> {
 			// Rows are unclear. Verbatim copy.
 			if (m.rows > rows)
 				m.makeIdentity(); // Handle filler.
-			for (int c = 0; c < columns; c++)
-				for (int r = 0; r < rows; r++)
+			for (int c = 0; c < m.columns; c++)
+				for (int r = 0; r < m.rows; r++)
 					m.set(r, c, get(r, c));
 		}
 		return m;
