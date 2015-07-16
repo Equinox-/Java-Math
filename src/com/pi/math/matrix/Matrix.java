@@ -158,6 +158,10 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return multiply(this, af);
 	}
 
+	public final E multiplyInto(Matrix a) {
+		return preMul(a);
+	}
+
 	public final E add(Matrix a, Matrix b) {
 		for (int c = 0; c < columns; c++)
 			for (int r = 0; r < rows; r++)

@@ -7,7 +7,7 @@ import com.pi.math.BufferProvider;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff3;
 
-public final class Matrix4 extends Transform<Matrix4> {
+public final class Matrix4 extends Trans3D<Matrix4> {
 	public Matrix4() {
 		this(BufferProvider.createFloatBuffer(16), 0);
 	}

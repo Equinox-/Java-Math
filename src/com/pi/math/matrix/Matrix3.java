@@ -6,7 +6,7 @@ import java.nio.FloatBuffer;
 import com.pi.math.BufferProvider;
 import com.pi.math.vector.Vector;
 
-public final class Matrix3 extends Transform<Matrix3> {
+public final class Matrix3 extends Trans3D<Matrix3> {
 	public Matrix3() {
 		this(BufferProvider.createFloatBuffer(9), 0);
 	}

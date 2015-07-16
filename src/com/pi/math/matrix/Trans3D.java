@@ -7,12 +7,12 @@ import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff3;
 
 @SuppressWarnings("unchecked")
-public abstract class Transform<E extends Transform<?>> extends Matrix<E> {
-	Transform(ByteBuffer f, int offset, final int r, final int c) {
+public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
+	Trans3D(ByteBuffer f, int offset, final int r, final int c) {
 		super(f, offset, r, c);
 	}
 
-	Transform(FloatBuffer f, int offset, final int r, final int c) {
+	Trans3D(FloatBuffer f, int offset, final int r, final int c) {
 		super(f, offset, r, c);
 	}
 

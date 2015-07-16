@@ -7,7 +7,7 @@ import com.pi.math.vector.VectorBuff4;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class SpecialMatrix {
-	public static Transform axisAngle(final Transform m, final float angle, final float x, final float y,
+	public static Trans3D axisAngle(final Trans3D m, final float angle, final float x, final float y,
 			final float z) {
 		final float c = (float) Math.cos(angle);
 		final float s = (float) Math.sin(angle);
@@ -41,21 +41,21 @@ public final class SpecialMatrix {
 		return m;
 	}
 
-	public static Transform scale(Transform m, float x, float y, float z) {
+	public static Trans3D scale(Trans3D m, float x, float y, float z) {
 		m.set(0, 0, x);
 		m.set(1, 1, y);
 		m.set(2, 2, z);
 		return m;
 	}
 
-	public static Transform translation(final Transform m, final float x, final float y, final float z) {
+	public static Trans3D translation(final Trans3D m, final float x, final float y, final float z) {
 		m.set(0, 3, x);
 		m.set(1, 3, y);
 		m.set(2, 3, z);
 		return m;
 	}
 
-	public static Transform quaternion(final Transform m, final float w, final float x, final float y, final float z) {
+	public static Trans3D quaternion(final Trans3D m, final float w, final float x, final float y, final float z) {
 		float xx = x * x;
 		float xy = x * y;
 		float xz = x * z;
@@ -81,7 +81,7 @@ public final class SpecialMatrix {
 	}
 
 	// Projections
-	public static Transform perspective(final Transform m, final float left, final float right, final float bottom,
+	public static Trans3D perspective(final Trans3D m, final float left, final float right, final float bottom,
 			final float top, final float near, final float far) {
 		final float near2 = 2 * near;
 		final float width = right - left, height = top - bottom, length = far - near;
@@ -97,7 +97,7 @@ public final class SpecialMatrix {
 		return m;
 	}
 
-	public static Transform orthographic(final Transform m, final float left, final float right, final float bottom,
+	public static Trans3D orthographic(final Trans3D m, final float left, final float right, final float bottom,
 			final float top, final float near, final float far) {
 		final float width = right - left, height = top - bottom, length = far - near;
 
@@ -112,7 +112,7 @@ public final class SpecialMatrix {
 		return m;
 	}
 
-	public static Transform toCompleteTransform(Transform dest, final Vector eulerRot, final Vector scale,
+	public static Trans3D toCompleteTransform(Trans3D dest, final Vector eulerRot, final Vector scale,
 			final Vector pos) {
 		VectorBuff4 tmpQuat = Heap.checkout(4);
 		Quaternion.fromEulerAngles(tmpQuat, eulerRot);
@@ -125,7 +125,7 @@ public final class SpecialMatrix {
 
 	private static final Matrix4 tmp = new Matrix4();
 
-	public static void fromCompleteTransform(final Transform src, Vector eulerRot, Vector scale, Vector pos) {
+	public static void fromCompleteTransform(final Trans3D src, Vector eulerRot, Vector scale, Vector pos) {
 		// First decompose the scale: grab the translation
 		src.copyTo(tmp);
 		// Decompose scale
