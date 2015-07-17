@@ -4,7 +4,6 @@ import com.pi.math.FastMath;
 import com.pi.math.MathUtil;
 
 public abstract class Vector {
-	private static final boolean DIMENSION_CHECK = false;
 	public static boolean ALLOW_ALLOCATION = true;
 
 	protected Vector() {
@@ -22,22 +21,13 @@ public abstract class Vector {
 
 	public abstract int dimension();
 
-	public final void check(Vector t) {
-		if (DIMENSION_CHECK) {
-			if (dimension() != t.dimension())
-				throw new IllegalArgumentException("Mismatch Dimensions");
-		}
-	}
-
 	public Vector scale(float f, Vector v) {
-		check(v);
 		for (int i = 0; i < dimension(); i++)
 			set(i, f * v.get(i));
 		return this;
 	}
 
 	public Vector negate(Vector v) {
-		check(v);
 		for (int i = 0; i < dimension(); i++)
 			set(i, -v.get(i));
 		return this;
@@ -52,15 +42,13 @@ public abstract class Vector {
 	}
 
 	public Vector add(Vector r) {
-		check(r);
 		for (int i = 0; i < dimension(); i++)
 			set(i, get(i) + r.get(i));
 		return this;
 	}
 
 	public Vector subtract(Vector r) {
-		check(r);
-		for (int i = 0; i < dimension(); i++)
+		for (int i = 0; i < Math.min(r.dimension(), dimension()); i++)
 			set(i, get(i) - r.get(i));
 		return this;
 	}
@@ -68,7 +56,7 @@ public abstract class Vector {
 	public Vector scale(float f) {
 		return multiply(f);
 	}
-	
+
 	public Vector scaleAdd(float s, Vector t1, Vector t2) {
 		return linearComb(t1, s, t2, 1);
 	}
@@ -88,7 +76,6 @@ public abstract class Vector {
 	}
 
 	public float distSquared(Vector t) {
-		check(t);
 		float r = 0;
 		for (int i = 0; i < dimension(); i++) {
 			final float delta = get(i) - t.get(i);
@@ -143,12 +130,10 @@ public abstract class Vector {
 	}
 
 	public static float dotProduct(Vector u, Vector v) {
-		u.check(v);
 		return u.dot(v);
 	}
 
 	public Vector linearComb(Vector a, float aC, Vector b, float bC) {
-		check(b);
 		for (int i = 0; i < Math.min(a.dimension(), b.dimension()); i++)
 			set(i, a.get(i) * aC + b.get(i) * bC);
 		return this;
@@ -209,9 +194,6 @@ public abstract class Vector {
 	 * Spherical linear interpolation from a to b, at time Vector in [0, 1]
 	 */
 	public static Vector slerp(Vector dest, Vector a, Vector b, float t) {
-		a.check(b);
-		a.check(dest);
-
 		final float angle = a.angle(b);
 		final float weightA = (float) (Math.sin((1 - t) * angle) / Math.sin(angle));
 		final float weightB = (float) (Math.sin(t * angle) / Math.sin(angle));

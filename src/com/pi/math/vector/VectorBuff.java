@@ -45,7 +45,6 @@ public class VectorBuff extends Vector {
 	public VectorBuff set(VectorBuff v) {
 		if (v == this)
 			return this;
-		check(v);
 		data.position(0);
 		v.data.position(0);
 		int ol = v.data.limit();
