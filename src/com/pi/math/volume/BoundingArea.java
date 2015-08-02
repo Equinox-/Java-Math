@@ -82,4 +82,9 @@ public class BoundingArea {
 				&& MathUtil.rayIntersectsBox(O, D, (VectorBuff3) min,
 						(VectorBuff3) max);
 	}
+	
+	@Override
+	public String toString() {
+		return "BoundingArea[min=" + min + ", max=" + max + ", rad=" + radius + "]";
+	}
 }

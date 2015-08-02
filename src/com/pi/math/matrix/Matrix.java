@@ -233,6 +233,8 @@ public abstract class Matrix<E extends Matrix<?>> {
 	}
 
 	public <R extends Matrix> R copyTo(R m) {
+		if (m == this)
+			return (R) this;
 		if (m.rows == rows) {
 			if (m.columns > columns) {
 				// Copying into more columns. Make identity, then copy.

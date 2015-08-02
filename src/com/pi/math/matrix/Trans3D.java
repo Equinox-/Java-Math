@@ -29,8 +29,6 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 	}
 
 	public E preMultiplyScale(final Vector s) {
-		if (s.dimension() != 3)
-			throw new IllegalArgumentException("Scaling only allowed by 3D vectors.");
 		return preMultiplyScale(s.get(0), s.get(1), s.get(2));
 	}
 
@@ -59,8 +57,6 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 	}
 
 	public E setAxisAngle(final float angle, final Vector a) {
-		if (a.dimension() != 3)
-			throw new RuntimeException("Rotation is only allowed around 3-D vectors");
 		return setAxisAngle(angle, a.get(0), a.get(1), a.get(2));
 	}
 
@@ -70,8 +66,6 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 	}
 
 	public E setTranslation(final Vector a) {
-		if (a.dimension() > 3)
-			throw new RuntimeException("Translation is only allowed for vectors of dimension 3 or less");
 		return setTranslation(a.dimension() > 0 ? a.get(0) : 0, a.dimension() > 1 ? a.get(1) : 0,
 				a.dimension() > 2 ? a.get(2) : 0);
 	}

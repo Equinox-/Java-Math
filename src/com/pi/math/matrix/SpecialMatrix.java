@@ -1,5 +1,6 @@
 package com.pi.math.matrix;
 
+import com.pi.math.FastMath;
 import com.pi.math.Heap;
 import com.pi.math.vector.Quaternion;
 import com.pi.math.vector.Vector;
@@ -7,10 +8,46 @@ import com.pi.math.vector.VectorBuff4;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class SpecialMatrix {
-	public static Trans3D axisAngle(final Trans3D m, final float angle, final float x, final float y,
-			final float z) {
-		final float c = (float) Math.cos(angle);
-		final float s = (float) Math.sin(angle);
+	public static Trans3D angleX(final Trans3D m, final float angle) {
+		final float c = FastMath.cos(angle);
+		final float s = FastMath.sin(angle);
+
+		m.makeIdentity();
+
+		m.set(1, 1, c);
+		m.set(2, 1, s);
+		m.set(1, 2, -s);
+		m.set(2, 2, c);
+		return m;
+	}
+
+	public static Trans3D angleY(final Trans3D m, final float angle) {
+		final float c = FastMath.cos(angle);
+		final float s = FastMath.sin(angle);
+		m.makeIdentity();
+
+		m.set(0, 0, c);
+		m.set(2, 0, -s);
+		m.set(0, 2, s);
+		m.set(2, 2, c);
+		return m;
+	}
+
+	public static Trans3D angleZ(final Trans3D m, final float angle) {
+		final float c = FastMath.cos(angle);
+		final float s = FastMath.sin(angle);
+		m.makeIdentity();
+
+		m.set(0, 0, c);
+		m.set(1, 0, s);
+		m.set(0, 1, -s);
+		m.set(1, 1, c);
+		return m;
+	}
+
+	public static Trans3D axisAngle(final Trans3D m, final float angle, final float x, final float y, final float z) {
+		final float c = FastMath.cos(angle);
+		final float s = FastMath.sin(angle);
 		final float c1 = 1 - c;
 
 		m.set(0, 0, c + x * x * c1);
