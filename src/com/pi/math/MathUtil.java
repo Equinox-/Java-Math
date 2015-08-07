@@ -3,8 +3,6 @@ package com.pi.math;
 import com.pi.math.vector.VectorBuff3;
 
 public class MathUtil {
-	public static final float EPSILON = .00001f;
-
 	private static VectorBuff3 subtract(VectorBuff3 lhs, VectorBuff3 rhs) {
 		VectorBuff3 dest = Heap.checkout(3);
 		dest.linearComb(lhs, 1, rhs, -1);
@@ -41,7 +39,7 @@ public class MathUtil {
 
 			// if determinant is near zero, ray lies in plane of triangle
 			det = e1.dot(P);
-			if (det > -EPSILON && det < EPSILON)
+			if (det > -EpsMath.EPSILON && det < EpsMath.EPSILON)
 				return null;
 			inv_det = 1.f / det;
 
@@ -66,7 +64,7 @@ public class MathUtil {
 
 			t = e2.dot(Q) * inv_det;
 
-			if (t > EPSILON) { // ray intersection
+			if (t > EpsMath.EPSILON) { // ray intersection
 				return dest.linearComb(O, 1, D, t);
 			}
 
@@ -88,7 +86,7 @@ public class MathUtil {
 		float b = D.dot(oMC);
 		float c = D.mag2() * (oMC.mag2() - radius * radius);
 		Heap.checkin(oMC);
-		return (b * b - c) > -MathUtil.EPSILON;
+		return (b * b - c) > -EpsMath.EPSILON;
 	}
 
 	public static boolean rayIntersectsBox(VectorBuff3 O, VectorBuff3 D, VectorBuff3 min, VectorBuff3 max) {
@@ -102,11 +100,11 @@ public class MathUtil {
 			for (int i = 0; i < 3; i++) {
 				if (O.get(i) < min.get(i)) {
 					inside = false;
-					if (Math.abs(D.get(i)) > EPSILON)
+					if (Math.abs(D.get(i)) > EpsMath.EPSILON)
 						maxT.set(i, (min.get(i) - O.get(i)) / D.get(i));
 				} else if (O.get(i) > max.get(i)) {
 					inside = false;
-					if (Math.abs(D.get(i)) > EPSILON)
+					if (Math.abs(D.get(i)) > EpsMath.EPSILON)
 						maxT.set(i, (max.get(i) - O.get(i)) / D.get(i));
 				}
 			}
@@ -130,7 +128,7 @@ public class MathUtil {
 			for (int i = 0; i < 3; i++) {
 				if (i != plane) {
 					float cd = O.get(i) + maxT.get(plane) * D.get(i);
-					if (cd < min.get(i) - EPSILON || cd > max.get(i) + EPSILON)
+					if (cd < min.get(i) - EpsMath.EPSILON || cd > max.get(i) + EpsMath.EPSILON)
 						return false;
 				}
 			}

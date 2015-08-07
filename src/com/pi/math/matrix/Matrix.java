@@ -108,7 +108,7 @@ public abstract class Matrix<E extends Matrix<?>> {
 		access.put(n, v);
 	}
 
-	public final E makeZero() {
+	public E makeZero() {
 		if (rows * columns <= ZERO_CACHE.length) {
 			access.position(0);
 			access.put(ZERO_CACHE, 0, rows * columns);
@@ -130,7 +130,24 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return (E) this;
 	}
 
-	public final E makeIdentity() {
+	protected void limitedTransposeInto(Matrix m, int rows, int cols) {
+		for (int r = 0; r < rows; r++) {
+			for (int c = 0; c < cols; c++) {
+				m.safeSet(c, r, get(r, c));
+			}
+		}
+	}
+
+	public <R extends Matrix<R>> R transposeInto(R m) {
+		limitedTransposeInto(m, rows, columns);
+		return m;
+	}
+
+	public final E transposeOf(Matrix m) {
+		return (E) m.transposeInto(this);
+	}
+
+	public E makeIdentity() {
 		if (rows <= IDENTITY_CACHE.length && columns <= IDENTITY_CACHE[rows - 1].length) {
 			if (IDENTITY_CACHE[rows - 1][columns - 1] == null) {
 				IDENTITY_CACHE[rows - 1][columns - 1] = new float[rows * columns];
@@ -187,21 +204,21 @@ public abstract class Matrix<E extends Matrix<?>> {
 	/**
 	 * this = m * this
 	 */
-	public E preMul(Matrix m) {
+	public final E preMul(Matrix m) {
 		return mul(m, this);
 	}
 
 	/**
 	 * this = this * m
 	 */
-	public E postMul(Matrix m) {
+	public final E postMul(Matrix m) {
 		return mul(this, m);
 	}
 
 	/**
 	 * this = lhs * rhs
 	 */
-	public final E mul(Matrix lhs, Matrix rhs) {
+	public E mul(Matrix lhs, Matrix rhs) {
 		if (lhs instanceof Matrix4 || rhs instanceof Matrix4) {
 			MatMulAlgs.mul44(this, lhs, rhs);
 		} else if (lhs instanceof Matrix34 || rhs instanceof Matrix34) {
@@ -217,7 +234,7 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return (E) this;
 	}
 
-	public final <R extends Matrix<R>> R invertInto(R m) {
+	public <R extends Matrix<R>> R invertInto(R m) {
 		if (this instanceof Matrix3)
 			MatInvAlgs.inv33(m, this);
 		else if (this instanceof Matrix34)
@@ -232,7 +249,7 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return (E) this;
 	}
 
-	public <R extends Matrix> R copyTo(R m) {
+	public <R extends Matrix<R>> R copyTo(R m) {
 		if (m == this)
 			return (R) this;
 		if (m.rows == rows) {

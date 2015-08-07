@@ -8,11 +8,21 @@ import com.pi.math.vector.VectorBuff4;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class SpecialMatrix {
+	private static void makeID3(Trans3D m) {
+		if (m.flags == Trans3D.FLAG_IDENTITY)
+			return;
+		m.flags &= ~Trans3D.FLAG_ROTATION_AND_SCALE;
+		for (int r = 0; r < 3; r++)
+			for (int c = 0; c < 3; c++)
+				m.set(r, c, r == c ? 1 : 0);
+	}
+
 	public static Trans3D angleX(final Trans3D m, final float angle) {
 		final float c = FastMath.cos(angle);
 		final float s = FastMath.sin(angle);
-
-		m.makeIdentity();
+		makeID3(m);
+		if (angle != 0)
+			m.flags |= Trans3D.FLAG_ROTATION;
 
 		m.set(1, 1, c);
 		m.set(2, 1, s);
@@ -24,7 +34,9 @@ public final class SpecialMatrix {
 	public static Trans3D angleY(final Trans3D m, final float angle) {
 		final float c = FastMath.cos(angle);
 		final float s = FastMath.sin(angle);
-		m.makeIdentity();
+		makeID3(m);
+		if (angle != 0)
+			m.flags |= Trans3D.FLAG_ROTATION;
 
 		m.set(0, 0, c);
 		m.set(2, 0, -s);
@@ -36,7 +48,9 @@ public final class SpecialMatrix {
 	public static Trans3D angleZ(final Trans3D m, final float angle) {
 		final float c = FastMath.cos(angle);
 		final float s = FastMath.sin(angle);
-		m.makeIdentity();
+		makeID3(m);
+		if (angle != 0)
+			m.flags |= Trans3D.FLAG_ROTATION;
 
 		m.set(0, 0, c);
 		m.set(1, 0, s);
@@ -49,6 +63,10 @@ public final class SpecialMatrix {
 		final float c = FastMath.cos(angle);
 		final float s = FastMath.sin(angle);
 		final float c1 = 1 - c;
+
+		m.flags &= ~Trans3D.FLAG_ROTATION_AND_SCALE;
+		if (angle != 0)
+			m.flags |= Trans3D.FLAG_ROTATION;
 
 		m.set(0, 0, c + x * x * c1);
 		m.set(1, 0, y * x * c1 + z * s);
@@ -82,6 +100,12 @@ public final class SpecialMatrix {
 		m.set(0, 0, x);
 		m.set(1, 1, y);
 		m.set(2, 2, z);
+
+		if (x != 1 || y != 1 || z != 1)
+			m.flags |= Trans3D.FLAG_SCALING;
+		else if (x == 1 && y == 1 && z == 1)
+			m.flags &= ~Trans3D.FLAG_SCALING;
+
 		return m;
 	}
 
@@ -89,6 +113,11 @@ public final class SpecialMatrix {
 		m.set(0, 3, x);
 		m.set(1, 3, y);
 		m.set(2, 3, z);
+
+		if (x == 0 && y == 0 && z == 0)
+			m.flags &= ~Trans3D.FLAG_TRANSLATION;
+		else if (x != 0 || y != 0 || z != 0)
+			m.flags |= Trans3D.FLAG_TRANSLATION;
 		return m;
 	}
 
@@ -114,6 +143,7 @@ public final class SpecialMatrix {
 		m.set(2, 0, 2.0f * (xz - wy));
 		m.set(2, 1, 2.0f * (yz + wx));
 		m.set(2, 2, 1.0f - 2.0f * (xx + yy));
+		m.flags |= Trans3D.FLAG_ROTATION;
 		return m;
 	}
 
@@ -131,6 +161,7 @@ public final class SpecialMatrix {
 		m.set(2, 2, -(far + near) / length);
 		m.set(3, 2, -1);
 		m.set(2, 3, -near2 * far / length);
+		m.flags |= Trans3D.FLAG_GENERAL;
 		return m;
 	}
 
@@ -146,6 +177,7 @@ public final class SpecialMatrix {
 		m.set(1, 3, -(top + bottom) / height);
 		m.set(2, 3, -(far + near) / length);
 		m.set(3, 3, 1);
+		m.flags |= Trans3D.FLAG_GENERAL;
 		return m;
 	}
 

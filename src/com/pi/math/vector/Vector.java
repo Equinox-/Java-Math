@@ -1,7 +1,7 @@
 package com.pi.math.vector;
 
+import com.pi.math.EpsMath;
 import com.pi.math.FastMath;
-import com.pi.math.MathUtil;
 
 public abstract class Vector {
 	public static boolean ALLOW_ALLOCATION = true;
@@ -161,7 +161,7 @@ public abstract class Vector {
 			if (v.dimension() != dimension())
 				return false;
 			for (int k = 0; k < dimension(); k++)
-				if (Math.abs(v.get(k) - get(k)) > MathUtil.EPSILON)
+				if (!EpsMath.eq(v.get(k), get(k)))
 					return false;
 			return true;
 		}

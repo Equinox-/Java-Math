@@ -6,8 +6,6 @@ public class MatMulAlgs {
 	// Aik (across row i of A) by the entries Bkj (down column j of B)
 
 	static void mul33(Matrix dest, Matrix lhs, Matrix rhs) {
-		if (dest.rows() > 3 || dest.columns() > 3)
-			dest.makeIdentity();
 		if (rhs == dest) {
 			for (int i = 0; i < 3; i++) {
 				final float bi0 = rhs.get(0, i), bi1 = rhs.get(1, i), bi2 = rhs.get(2, i);
@@ -23,6 +21,14 @@ public class MatMulAlgs {
 				dest.set(i, 2, ai0 * rhs.get(0, 2) + ai1 * rhs.get(1, 2) + ai2 * rhs.get(2, 2));
 			}
 		}
+
+		// Clear out remainder with ID
+		for (int r = 3; r < dest.rows; r++)
+			for (int c = 0; c < dest.columns; c++)
+				dest.set(r, c, r == c ? 1 : 0);
+		for (int c = 3; c < dest.columns; c++)
+			for (int r = 0; r < dest.rows; r++)
+				dest.set(r, c, r == c ? 1 : 0);
 	}
 
 	static void mul34(Matrix dest, Matrix lhs, Matrix rhs) {
@@ -44,11 +50,16 @@ public class MatMulAlgs {
 				dest.set(i, 3, ai0 * rhs.get(0, 3) + ai1 * rhs.get(1, 3) + ai2 * rhs.get(2, 3) + ai3);
 			}
 		}
+		// Clear out remainder with ID
+		for (int r = 3; r < dest.rows; r++)
+			for (int c = 0; c < dest.columns; c++)
+				dest.set(r, c, r == c ? 1 : 0);
+		for (int c = 4; c < dest.columns; c++)
+			for (int r = 0; r < dest.rows; r++)
+				dest.set(r, c, r == c ? 1 : 0);
 	}
 
 	static void mul44(Matrix dest, Matrix lhs, Matrix rhs) {
-		if (dest.rows() > 4 || dest.columns() > 4)
-			dest.makeIdentity();
 		if (rhs == dest) {
 			for (int i = 0; i < 4; i++) {
 				final float bi0 = rhs.get(0, i), bi1 = rhs.get(1, i), bi2 = rhs.get(2, i), bi3 = rhs.get(3, i);
@@ -66,5 +77,12 @@ public class MatMulAlgs {
 				dest.set(i, 3, ai0 * rhs.get(0, 3) + ai1 * rhs.get(1, 3) + ai2 * rhs.get(2, 3) + ai3 * rhs.get(3, 3));
 			}
 		}
+		// Clear out remainder with ID
+		for (int r = 4; r < dest.rows; r++)
+			for (int c = 0; c < dest.columns; c++)
+				dest.set(r, c, r == c ? 1 : 0);
+		for (int c = 4; c < dest.columns; c++)
+			for (int r = 0; r < dest.rows; r++)
+				dest.set(r, c, r == c ? 1 : 0);
 	}
 }
