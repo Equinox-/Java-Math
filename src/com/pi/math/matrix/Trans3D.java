@@ -181,6 +181,8 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public final <R extends Matrix<R>> R invertInto(R k) {
+		if (!(k instanceof Trans3D))
+			return super.invertInto(k);
 		Trans3D m = (Trans3D) k;
 		if ((flags & FLAG_GENERAL) == FLAG_GENERAL || (flags & FLAG_SCALING) == FLAG_SCALING) {
 			m.flags = FLAG_GENERAL;
@@ -194,13 +196,6 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		}
 		if ((flags & FLAG_TRANSLATION) == FLAG_TRANSLATION)
 			m.preMultiplyTransform(-get(0, 3), -get(1, 3), -get(2, 3));
-
-		VectorBuff3 tmp = Heap.checkout3();
-		tmp.setV(1, 33, 4);
-		this.transform(tmp);
-		m.transform(tmp);
-		if (!EpsMath.eq(tmp.get(0), 1) || !EpsMath.eq(tmp.get(1), 33) || !EpsMath.eq(tmp.get(2), 4))
-			System.err.println("bad inverse");
 		return (R) m;
 	}
 
@@ -286,17 +281,18 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		flags = computeFlags();
 	}
 
-//	private void checkFlags() {
-//		if ((flags & FLAG_GENERAL) > 0)
-//			return;// Generals have no constraint.
-//		int expect = computeFlags();
-//		if ((expect | (flags & FLAG_ROTATION)) != flags && expect != 0) {
-//			System.err.println("Bad flag control: Have: " + Integer.toBinaryString(flags) + " should be "
-//					+ Integer.toBinaryString(expect));
-//			System.err.println(this);
-//			new Exception().printStackTrace();
-//			System.err.println();
-//		}
-//		flags = expect;
-//	}
+	// private void checkFlags() {
+	// if ((flags & FLAG_GENERAL) > 0)
+	// return;// Generals have no constraint.
+	// int expect = computeFlags();
+	// if ((expect | (flags & FLAG_ROTATION)) != flags && expect != 0) {
+	// System.err.println("Bad flag control: Have: " +
+	// Integer.toBinaryString(flags) + " should be "
+	// + Integer.toBinaryString(expect));
+	// System.err.println(this);
+	// new Exception().printStackTrace();
+	// System.err.println();
+	// }
+	// flags = expect;
+	// }
 }

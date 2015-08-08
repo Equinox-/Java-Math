@@ -1,7 +1,7 @@
 package com.pi.math;
 
 public class EpsMath {
-	public static final float EPSILON = .00001f;
+	public static final float EPSILON = .0001f;
 
 	public static boolean eq(float a, float b) {
 		return eq(a, b, EPSILON);
