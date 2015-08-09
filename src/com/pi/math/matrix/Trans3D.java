@@ -178,6 +178,21 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		return (E) this;
 	}
 
+	public final <R extends Trans3D<R>> R normalInto(R m) {
+		if ((flags & FLAG_GENERAL) == FLAG_GENERAL || (flags & FLAG_SCALING) == FLAG_SCALING) {
+			m.flags = FLAG_GENERAL;
+			super.invertInto(m).transposeInPlace();
+			if (m.columns() > 3)
+				m.column(3).setV(0, 0, 0, 1);
+			if (m.rows() > 3)
+				for (int l = 0; l < 3; l++)
+					m.set(3, l, 0);
+			return m;
+		} else if (flags == FLAG_IDENTITY)
+			return m.makeIdentity();
+		return copyTo(m);
+	}
+
 	@Override
 	@SuppressWarnings("rawtypes")
 	public final <R extends Matrix<R>> R invertInto(R k) {
@@ -194,7 +209,7 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 			limitedTransposeInto(m, 3, 3);
 			m.flags |= FLAG_ROTATION;
 		}
-		if ((flags & FLAG_TRANSLATION) == FLAG_TRANSLATION)
+		if ((flags & FLAG_TRANSLATION) == FLAG_TRANSLATION && k.columns() > 3)
 			m.preMultiplyTransform(-get(0, 3), -get(1, 3), -get(2, 3));
 		return (R) m;
 	}
