@@ -134,7 +134,7 @@ public abstract class Vector {
 	}
 
 	public Vector linearComb(Vector a, float aC, Vector b, float bC) {
-		for (int i = 0; i < Math.min(a.dimension(), b.dimension()); i++)
+		for (int i = 0; i < Math.min(dimension(), Math.min(a.dimension(), b.dimension())); i++)
 			set(i, a.get(i) * aC + b.get(i) * bC);
 		return this;
 	}

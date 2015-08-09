@@ -263,6 +263,6 @@ public class MatInvAlgs {
 
 		for (int i = 0; i < 4; i++)
 			for (int j = 0; j < 4; j++)
-				out.set(i, j, r[i][j + 4]);
+				out.safeSet(i, j, r[i][j + 4]);
 	}
 }
