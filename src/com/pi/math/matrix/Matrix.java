@@ -303,19 +303,31 @@ public abstract class Matrix<E extends Matrix<?>> {
 	public static String toString(Matrix... show) {
 		StringBuilder res = new StringBuilder();
 		int mxk = 0;
-		for (Matrix m : show)
-			mxk = Math.max(mxk, m.rows());
+		for (Matrix m : show) {
+			mxk = Math.max(mxk, m.rows() + (m instanceof Trans3D ? 1 : 0));
+		}
 
 		for (int i = 0; i < mxk; i++) {
 			if (i > 0)
 				res.append('\n');
 			for (Matrix m : show) {
 				if (i < m.rows()) {
-					for (int c = 0; c < m.columns(); c++)
-						res.append(String.format("%+2.8f ", m.get(i, c)));
+					for (int c = 0; c < m.columns(); c++) {
+						int mMag = (int) Math.floor(Math.log10(Math.abs(m.column(c).maxCV()) + 1));
+						res.append(String.format("%+" + (mMag + 11) + ".8f ", m.get(i, c)));
+					}
 				} else {
+					int rw = 0;
 					for (int c = 0; c < m.columns(); c++)
-						res.append("            ");
+						rw += 11 + (int) Math.ceil(Math.log10(Math.abs(m.column(c).maxCV()) + 1));
+					int l = 0;
+					if (m instanceof Trans3D && i == m.rows()) {
+						String s = "f=" + Integer.toBinaryString(((Trans3D) m).flags);
+						res.append(s);
+						l += s.length();
+					}
+					for (; l < rw; l++)
+						res.append(' ');
 				}
 				res.append("      ");
 			}

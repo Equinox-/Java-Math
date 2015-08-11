@@ -149,7 +149,8 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		final int frhs = rhs.flags;
 		if ((flhs & FLAG_GENERAL) == FLAG_GENERAL || (frhs & FLAG_GENERAL) == FLAG_GENERAL) {
 			flags = FLAG_GENERAL;
-			return super.mul(lhs, rhs);
+			super.mul(lhs, rhs);
+			return (E) this;
 		}
 		// Two translations/identities. Result = translation sum
 		if ((flhs & ~FLAG_TRANSLATION) == 0 && (frhs & ~FLAG_TRANSLATION) == 0) {
@@ -190,7 +191,13 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 			return m;
 		} else if (flags == FLAG_IDENTITY)
 			return m.makeIdentity();
-		return copyTo(m);
+		copyTo(m);
+		if (m.columns > 3)
+			if (m.rows > 3)
+				m.column(3).setV(0, 0, 0, 1);
+			else
+				m.column(3).setV(0, 0, 0);
+		return m;
 	}
 
 	@Override
@@ -267,7 +274,7 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 				return FLAG_IDENTITY;
 		}
 		int flags = 0;
-		if (column(3).mag2() > 1)
+		if (columns > 3 && column(3).mag2() > 1)
 			flags |= FLAG_TRANSLATION;
 		// X cross Y = Z
 		VectorBuff3 x = new VectorBuff3(column(0).getAccessor(), 0);

@@ -139,6 +139,26 @@ public abstract class Vector {
 		return this;
 	}
 
+	/**
+	 * @return maximum component value
+	 */
+	public float maxCV() {
+		float m = -Integer.MAX_VALUE;
+		for (int i = 0; i < dimension(); i++)
+			m = Math.max(m, get(i));
+		return m;
+	}
+
+	/**
+	 * @return minimum component value
+	 */
+	public float minCV() {
+		float m = Integer.MAX_VALUE;
+		for (int i = 0; i < dimension(); i++)
+			m = Math.min(m, get(i));
+		return m;
+	}
+
 	public static Vector crossProduct(Vector dest, Vector u, Vector v) {
 		if (u.dimension() != 3 || v.dimension() != 3 || dest.dimension() != 3)
 			throw new IllegalArgumentException("Cross product is only valid in three dimensions");
