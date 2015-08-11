@@ -18,6 +18,90 @@ public class MathUtil {
 		return dest;
 	}
 
+	// axis, collision rad, height
+	public static float lineIntersectsSegment(final VectorBuff3 o, final VectorBuff3 d, final int axis, final float rad,
+			final float height) {
+		final int ax1 = (axis + 1) % 3;
+		final int ax2 = (axis + 2) % 3;
+
+		final float a = d.get(ax1) * d.get(ax1) + d.get(ax2) * d.get(ax2);
+		final float b = 2 * (o.get(ax1) * d.get(ax1) + o.get(ax2) * d.get(ax2));
+		final float c = o.get(ax1) * o.get(ax1) + o.get(ax2) * o.get(ax2) - rad * rad;
+		final float t = (-b + (float) Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+		if (Float.isNaN(t))
+			return t; // Doesn't hit x-axis
+		final float cX = o.get(axis) + d.get(axis) * t;
+		if (cX < 0 || cX > height)
+			return Float.NaN; // Doesn't hit segment.
+		return t;
+	}
+
+	public static float segmentDistanceSegment(final VectorBuff3 rayA, final VectorBuff3 rayB, final VectorBuff3 segA,
+			final VectorBuff3 segB, final float rad) {
+		// http://geomalgorithms.com/a07-_distance.html#dist3D_Segment_to_Segment()
+		VectorBuff3 u = subtract(rayB, rayA);
+		VectorBuff3 v = subtract(segB, segA);
+		VectorBuff3 w = subtract(rayA, segA);
+		float uMag2 = u.mag2(); // always >= 0
+		float uDotV = u.dot(v);
+		float vMag2 = v.mag2(); // always >= 0
+		float uDotW = u.dot(w);
+		float vDotW = v.dot(w);
+		float D = uMag2 * vMag2 - uDotV * uDotV; // always >= 0
+		float sc, sN, sD = D; // sc = sN / sD, default sD = D >= 0
+		float tc, tN, tD = D; // tc = tN / tD, default tD = D >= 0
+
+		// compute the line parameters of the two closest points
+		if (EpsMath.zero(D)) { // the lines are almost parallel
+			sN = 0.0f; // force using point P0 on segment S1
+			sD = 1.0f; // to prevent possible division by 0.0 later
+			tN = vDotW;
+			tD = vMag2;
+		} else { // get the closest points on the infinite lines
+			sN = (uDotV * vDotW - vMag2 * uDotW);
+			tN = (uMag2 * vDotW - uDotV * uDotW);
+			if (sN < 0.0) { // sc < 0 => the s=0 edge is visible
+				sN = 0.0f;
+				tN = vDotW;
+				tD = vMag2;
+			} else if (sN > sD) { // sc > 1 => the s=1 edge is visible
+				sN = sD;
+				tN = vDotW + uDotV;
+				tD = vMag2;
+			}
+		}
+
+		if (tN < 0.0) { // tc < 0 => the t=0 edge is visible
+			tN = 0.0f;
+			// recompute sc for this edge
+			if (-uDotW < 0.0f)
+				sN = 0.0f;
+			else if (-uDotW > uMag2)
+				sN = sD;
+			else {
+				sN = -uDotW;
+				sD = uMag2;
+			}
+		} else if (tN > tD) { // tc > 1 => the t=1 edge is visible
+			tN = tD;
+			// recompute sc for this edge
+			if ((-uDotW + uDotV) < 0.0)
+				sN = 0;
+			else if ((-uDotW + uDotV) > uMag2)
+				sN = sD;
+			else {
+				sN = (-uDotW + uDotV);
+				sD = uMag2;
+			}
+		}
+		// finally do the division to get sc and tc
+		sc = (EpsMath.zero(sN) ? 0.0f : sN / sD);
+		tc = (EpsMath.zero(tN) ? 0.0f : tN / tD);
+
+		Heap.checkin(u, v, w);
+		return w.magnitude() + sc * u.magnitude() - tc * v.magnitude();
+	}
+
 	public static VectorBuff3 rayIntersectsTriangle(VectorBuff3 dest, VectorBuff3 O, VectorBuff3 D, VectorBuff3 v0,
 			VectorBuff3 v1, VectorBuff3 v2) {
 		// Moller-Trumbore ray-triangle intersection algorithm
