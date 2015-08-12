@@ -13,6 +13,10 @@ public class VectorBuff3 extends VectorBuff {
 		this(BufferProvider.createFloatBuffer(3), 0);
 	}
 
+	public VectorBuff3(FloatBuffer f) {
+		this(f, 0);
+	}
+
 	@Override
 	public VectorBuff3 setV(float... f) {
 		super.setV(f);

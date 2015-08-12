@@ -19,6 +19,10 @@ public final class Matrix3 extends Trans3D<Matrix3> {
 		super(f, offset, 3, 3);
 	}
 
+	public Matrix3(FloatBuffer f) {
+		this(f, 0);
+	}
+
 	@Override
 	public <E extends Vector> E transform(E outset, final Vector inset) {
 		for (int k = 0; k < outset.dimension(); k++)

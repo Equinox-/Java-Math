@@ -20,6 +20,10 @@ public final class Matrix4 extends Trans3D<Matrix4> {
 		super(f, offset, 4, 4);
 	}
 
+	public Matrix4(FloatBuffer f) {
+		this(f, 0);
+	}
+
 	// Math operations
 	@Override
 	public <E extends Vector> E transform(E outset, final Vector inset) {
