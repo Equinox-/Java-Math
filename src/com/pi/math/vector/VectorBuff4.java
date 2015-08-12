@@ -13,6 +13,10 @@ public class VectorBuff4 extends VectorBuff {
 		this(BufferProvider.createFloatBuffer(4), 0);
 	}
 
+	public VectorBuff4(FloatBuffer f) {
+		this(f, 0);
+	}
+
 	public VectorBuff4 add(VectorBuff4 r) {
 		data.put(0, data.get(0) + r.data.get(0));
 		data.put(1, data.get(1) + r.data.get(1));
@@ -56,16 +60,15 @@ public class VectorBuff4 extends VectorBuff {
 	}
 
 	public float dot(VectorBuff4 v) {
-		return data.get(0) * v.data.get(0) + data.get(1) * v.data.get(1)
-				+ data.get(2) * v.data.get(2) + data.get(3) * v.data.get(3);
+		return data.get(0) * v.data.get(0) + data.get(1) * v.data.get(1) + data.get(2) * v.data.get(2)
+				+ data.get(3) * v.data.get(3);
 	}
 
 	public VectorBuff4 linearComb(float aC, VectorBuff4 b, float bC) {
 		return linearComb(this, aC, b, bC);
 	}
 
-	public VectorBuff4 linearComb(VectorBuff4 a, float aC, VectorBuff4 b,
-			float bC) {
+	public VectorBuff4 linearComb(VectorBuff4 a, float aC, VectorBuff4 b, float bC) {
 		data.put(0, aC * a.data.get(0) + bC * b.data.get(0));
 		data.put(1, aC * a.data.get(1) + bC * b.data.get(1));
 		data.put(2, aC * a.data.get(2) + bC * b.data.get(2));
