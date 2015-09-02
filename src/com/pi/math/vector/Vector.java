@@ -77,7 +77,7 @@ public abstract class Vector {
 
 	public float distSquared(Vector t) {
 		float r = 0;
-		for (int i = 0; i < dimension(); i++) {
+		for (int i = 0; i < Math.min(t.dimension(), dimension()); i++) {
 			final float delta = get(i) - t.get(i);
 			r += delta * delta;
 		}

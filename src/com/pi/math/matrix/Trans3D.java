@@ -162,7 +162,11 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 			return (E) this;
 		}
 
-		VectorBuff3 tmp = (VectorBuff3) lhs.transform(Heap.checkout3(), rhs.column(3));
+		VectorBuff3 tmp = null;
+		if (rhs.columns > 3)
+			tmp = (VectorBuff3) lhs.transform(Heap.checkout3(), rhs.column(3));
+		else if (lhs.columns > 3)
+			tmp = Heap.checkout3().set(lhs.column(3));
 
 		if ((flhs & FLAG_ROTATION_AND_SCALE) > 0 && (frhs & FLAG_ROTATION_AND_SCALE) > 0) {
 			MatMulAlgs.mul33(this, lhs, rhs);
@@ -173,8 +177,12 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		} else {
 			makeIdentity();
 		}
-		column(3).set(tmp);
-		Heap.checkin(tmp);
+		if (tmp != null) {
+			column(3).set(tmp);
+			Heap.checkin(tmp);
+		} else if (columns > 3) {
+			column(3).setV(0, 0, 0, 1);
+		}
 		flags = flhs | frhs;
 		return (E) this;
 	}

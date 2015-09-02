@@ -37,7 +37,7 @@ public class MathUtil {
 	}
 
 	public static float segmentDistanceSegment(final VectorBuff3 rayA, final VectorBuff3 rayB, final VectorBuff3 segA,
-			final VectorBuff3 segB, final float rad) {
+			final VectorBuff3 segB) {
 		// http://geomalgorithms.com/a07-_distance.html#dist3D_Segment_to_Segment()
 		VectorBuff3 u = subtract(rayB, rayA);
 		VectorBuff3 v = subtract(segB, segA);
@@ -98,8 +98,11 @@ public class MathUtil {
 		sc = (EpsMath.zero(sN) ? 0.0f : sN / sD);
 		tc = (EpsMath.zero(tN) ? 0.0f : tN / tD);
 
-		Heap.checkin(u, v, w);
-		return w.magnitude() + sc * u.magnitude() - tc * v.magnitude();
+		VectorBuff3 tmp = Heap.checkout3().linearComb(w,1,u,sc);
+		tmp.linearComb(1, v, -tc);
+		float fv = tmp.magnitude();
+		Heap.checkin(tmp, u, v, w);
+		return fv;
 	}
 
 	public static VectorBuff3 rayIntersectsTriangle(VectorBuff3 dest, VectorBuff3 O, VectorBuff3 D, VectorBuff3 v0,
