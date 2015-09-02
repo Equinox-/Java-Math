@@ -92,6 +92,10 @@ public abstract class Vector {
 		return multiply(FastMath.Q_rsqrt(mag2()));
 	}
 
+	public final Vector length(float len) {
+		return multiply(len * FastMath.Q_rsqrt(mag2()));
+	}
+
 	public float mag2() {
 		float r = 0;
 		for (int i = 0; i < dimension(); i++) {
