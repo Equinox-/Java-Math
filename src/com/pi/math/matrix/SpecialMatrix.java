@@ -4,6 +4,7 @@ import com.pi.math.FastMath;
 import com.pi.math.Heap;
 import com.pi.math.vector.Quaternion;
 import com.pi.math.vector.Vector;
+import com.pi.math.vector.VectorBuff;
 import com.pi.math.vector.VectorBuff4;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -79,20 +80,6 @@ public final class SpecialMatrix {
 		m.set(0, 2, x * z * c1 + y * s);
 		m.set(1, 2, y * z * c1 - x * s);
 		m.set(2, 2, c + z * z * c1);
-
-		if (m.columns() > 3) {
-			m.set(3, 0, 0);
-			m.set(3, 1, 0);
-			m.set(3, 2, 0);
-		}
-
-		if (m.rows() > 3) {
-			m.set(0, 3, 0);
-			m.set(1, 3, 0);
-			m.set(2, 3, 0);
-			if (m.columns() > 3)
-				m.set(3, 3, 1);
-		}
 		return m;
 	}
 
@@ -179,6 +166,38 @@ public final class SpecialMatrix {
 		m.set(3, 3, 1);
 		m.flags |= Trans3D.FLAG_GENERAL;
 		return m;
+	}
+
+	public static VectorBuff matrixToEuler(final Trans3D in, VectorBuff out) {
+		// phi, theta, psi
+		final float psi = (float) Math.atan2(-in.get(1, 0), in.get(0, 0));
+		final float theta = (float) Math.asin(in.get(2, 0));
+		final float phi = (float) Math.atan2(-in.get(2, 1), in.get(2, 2));
+		out.setV(phi, theta, psi);
+		return out;
+	}
+
+	public static Trans3D eulerToMatrix(final VectorBuff in, Trans3D out) {
+		makeID3(out);
+		// phi, theta, psi
+		final float sinPhi = FastMath.sin(in.get(0));
+		final float cosPhi = FastMath.cos(in.get(0));
+		final float sinTheta = FastMath.sin(in.get(1));
+		final float cosTheta = FastMath.cos(in.get(1));
+		final float sinPsi = FastMath.sin(in.get(2));
+		final float cosPsi = FastMath.cos(in.get(2));
+
+		out.flags |= Trans3D.FLAG_ROTATION;
+		out.set(0, 0, cosTheta * cosPsi);
+		out.set(1, 0, -cosTheta * sinPsi);
+		out.set(2, 0, sinTheta);
+		out.set(0, 1, cosPhi * sinPsi + sinPhi * sinTheta * cosPsi);
+		out.set(1, 1, cosPhi * cosPsi - sinPhi * sinTheta * sinPsi);
+		out.set(2, 1, -sinPhi * cosTheta);
+		out.set(0, 2, sinPhi * sinPsi - cosPhi * sinTheta * cosPsi);
+		out.set(1, 2, sinPhi * cosPsi + cosPhi * sinTheta * sinPsi);
+		out.set(2, 2, cosPhi * cosTheta);
+		return out;
 	}
 
 	public static Trans3D toCompleteTransform(Trans3D dest, final Vector eulerRot, final Vector scale,
