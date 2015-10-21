@@ -42,7 +42,7 @@ public abstract class Vector {
 	}
 
 	public Vector add(Vector r) {
-		for (int i = 0; i < dimension(); i++)
+		for (int i = 0; i < Math.min(r.dimension(), dimension()); i++)
 			set(i, get(i) + r.get(i));
 		return this;
 	}

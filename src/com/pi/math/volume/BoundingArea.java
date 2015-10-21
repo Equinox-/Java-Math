@@ -49,6 +49,19 @@ public class BoundingArea {
 		return radius;
 	}
 
+	public float getRadius(int axis) {
+		float span = 0;
+		for (int i = 1; i < min.dimension(); i++) {
+			final int c = (i + axis) % min.dimension();
+			span = Math.max(span, max.get(c) - center.get(c));
+		}
+		return span;
+	}
+
+	public float getHeight(int axis) {
+		return max.get(axis) - min.get(axis);
+	}
+
 	public void include(VectorBuff v) {
 		if (v.dimension() != min.dimension())
 			throw new IllegalArgumentException("Mismatched dimensions.");
@@ -76,13 +89,11 @@ public class BoundingArea {
 
 	public boolean rayIntersects(VectorBuff3 O, VectorBuff3 D) {
 		if (min.dimension() != 3)
-			throw new IllegalArgumentException(
-					"Ray intersection only allowed in 3-space.");
+			throw new IllegalArgumentException("Ray intersection only allowed in 3-space.");
 		return MathUtil.rayIntersectsSphere(O, D, (VectorBuff3) center, radius)
-				&& MathUtil.rayIntersectsBox(O, D, (VectorBuff3) min,
-						(VectorBuff3) max);
+				&& MathUtil.rayIntersectsBox(O, D, (VectorBuff3) min, (VectorBuff3) max);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "BoundingArea[min=" + min + ", max=" + max + ", rad=" + radius + "]";
