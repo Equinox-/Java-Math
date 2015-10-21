@@ -20,15 +20,28 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 
 	static final int FLAG_ROTATION_AND_SCALE = FLAG_ROTATION | FLAG_SCALING;
 	int flags;
+	final VectorBuff[] column3;
 
 	Trans3D(ByteBuffer f, int offset, final int r, final int c) {
 		super(f, offset, r, c);
 		flags = FLAG_GENERAL;
+		if (r > 3) {
+			column3 = new VectorBuff3[c];
+			for (int i = 0; i < c; i++)
+				column3[i] = new VectorBuff3(column(i).getAccessor(), 0);
+		} else
+			column3 = super.cols;
 	}
 
 	Trans3D(FloatBuffer f, int offset, final int r, final int c) {
 		super(f, offset, r, c);
 		flags = FLAG_GENERAL;
+		if (r > 3) {
+			column3 = new VectorBuff3[c];
+			for (int i = 0; i < c; i++)
+				column3[i] = new VectorBuff3(column(i).getAccessor(), 0);
+		} else
+			column3 = super.cols;
 	}
 
 	// Makes this matrix a dirty matrix for low-performance inversions and
@@ -285,9 +298,9 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		if (columns > 3 && column(3).mag2() > 1)
 			flags |= FLAG_TRANSLATION;
 		// X cross Y = Z
-		VectorBuff3 x = new VectorBuff3(column(0).getAccessor(), 0);
-		VectorBuff3 y = new VectorBuff3(column(1).getAccessor(), 0);
-		VectorBuff3 z = new VectorBuff3(column(2).getAccessor(), 0);
+		VectorBuff3 x = (VectorBuff3) column3[0];
+		VectorBuff3 y = (VectorBuff3) column3[1];
+		VectorBuff3 z = (VectorBuff3) column3[2];
 		if (x.mag2() == 0 || y.mag2() == 0 || z.mag2() == 0)
 			return FLAG_GENERAL;
 		VectorBuff3 tmp = Heap.checkout3().cross(x, y);

@@ -18,6 +18,10 @@ public class FastMath {
 		return y;
 	}
 
+	public static int nextMultiple(int n, int mod) {
+		return (int) (Math.ceil(n / (float) mod) * mod);
+	}
+
 	public static int nextPowerOf2(int n) {
 		n--;
 		n |= n >> 1;
