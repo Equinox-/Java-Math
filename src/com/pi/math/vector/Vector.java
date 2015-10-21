@@ -85,15 +85,15 @@ public abstract class Vector {
 	}
 
 	public final Vector normalize(Vector v) {
-		return linearComb(0, v, FastMath.Q_rsqrt(v.mag2()));
+		return linearComb(0, v, invSqrt());
 	}
 
 	public final Vector normalize() {
-		return multiply(FastMath.Q_rsqrt(mag2()));
+		return multiply(invSqrt());
 	}
 
 	public final Vector length(float len) {
-		return multiply(len * FastMath.Q_rsqrt(mag2()));
+		return multiply(len * invSqrt());
 	}
 
 	public float mag2() {
@@ -126,7 +126,11 @@ public abstract class Vector {
 	}
 
 	public final float angle(Vector v) {
-		return (float) Math.acos(dot(v) * FastMath.Q_rsqrt(mag2()) * FastMath.Q_rsqrt(v.mag2()));
+		return (float) Math.acos(dot(v) * invSqrt() * v.invSqrt());
+	}
+
+	public float invSqrt() {
+		return FastMath.Q_rsqrt(mag2());
 	}
 
 	public Vector linearComb(float aC, Vector b, float bC) {

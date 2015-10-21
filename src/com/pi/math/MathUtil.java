@@ -3,6 +3,10 @@ package com.pi.math;
 import com.pi.math.vector.VectorBuff3;
 
 public class MathUtil {
+	public static float uFmod(float a, float mod) {
+		return ((a % mod) + mod) % mod;
+	}
+
 	private static VectorBuff3 subtract(VectorBuff3 lhs, VectorBuff3 rhs) {
 		VectorBuff3 dest = Heap.checkout(3);
 		dest.linearComb(lhs, 1, rhs, -1);
@@ -98,7 +102,7 @@ public class MathUtil {
 		sc = (EpsMath.zero(sN) ? 0.0f : sN / sD);
 		tc = (EpsMath.zero(tN) ? 0.0f : tN / tD);
 
-		VectorBuff3 tmp = Heap.checkout3().linearComb(w,1,u,sc);
+		VectorBuff3 tmp = Heap.checkout3().linearComb(w, 1, u, sc);
 		tmp.linearComb(1, v, -tc);
 		float fv = tmp.magnitude();
 		Heap.checkin(tmp, u, v, w);
