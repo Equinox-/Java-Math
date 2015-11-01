@@ -18,4 +18,8 @@ public class EpsMath {
 	public static boolean zero(float a, float eps) {
 		return Math.abs(a) <= eps;
 	}
+
+	public static boolean lt(float a, float b) {
+		return a + EPSILON < b;
+	}
 }
