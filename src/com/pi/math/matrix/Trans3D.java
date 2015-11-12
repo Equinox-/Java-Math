@@ -323,6 +323,10 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 	public void setFlags() {
 		flags = computeFlags();
 	}
+	
+	public void flagTranslation() {
+		flags |= FLAG_TRANSLATION;
+	}
 
 	// private void checkFlags() {
 	// if ((flags & FLAG_GENERAL) > 0)
