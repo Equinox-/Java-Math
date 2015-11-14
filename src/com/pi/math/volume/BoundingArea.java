@@ -30,7 +30,7 @@ public class BoundingArea {
 	public void reset() {
 		min.setV(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 		max.setV(-Float.MAX_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
-		center.multiply(0);
+		center.zero();
 	}
 
 	public VectorBuff getMin() {

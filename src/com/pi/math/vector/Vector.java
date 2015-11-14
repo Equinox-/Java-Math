@@ -67,6 +67,12 @@ public abstract class Vector {
 		return this;
 	}
 
+	public Vector multiplyComponents(Vector r) {
+		for (int i = 0; i < Math.min(r.dimension(), dimension()); i++)
+			set(i, get(i) * r.get(i));
+		return this;
+	}
+
 	public final float magnitude() {
 		return (float) Math.sqrt(mag2());
 	}
@@ -94,6 +100,12 @@ public abstract class Vector {
 
 	public final Vector length(float len) {
 		return multiply(len * invSqrt());
+	}
+
+	public Vector zero() {
+		for (int i = 0; i < dimension(); i++)
+			set(i, 0);
+		return this;
 	}
 
 	public float mag2() {

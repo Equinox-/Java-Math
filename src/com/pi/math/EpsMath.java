@@ -22,4 +22,8 @@ public class EpsMath {
 	public static boolean lt(float a, float b) {
 		return a + EPSILON < b;
 	}
+
+	public static boolean le(float a, float b) {
+		return a <= b + EPSILON;
+	}
 }
