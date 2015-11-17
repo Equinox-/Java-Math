@@ -54,8 +54,10 @@ public class MatInvAlgs {
 
 		det = pos + neg;
 
-		if (Math.abs(det) < 1e-25)
-			throw new IllegalArgumentException("Inv det==0 matrix");
+		if (Math.abs(det) < 1e-25) {
+			System.err.println("Warn: Bad inv33core input matrix");
+			return;
+		}
 
 		det = 1.0F / det;
 		out.set(0, 0, ((in.get(1, 1) * in.get(2, 2) - in.get(2, 1) * in.get(1, 2)) * det));
@@ -121,8 +123,10 @@ public class MatInvAlgs {
 			swap(r, 2, 1);
 		if (Math.abs(r[1][0]) > Math.abs(r[0][0]))
 			swap(r, 1, 0);
-		if (0.0 == r[0][0])
-			throw new IllegalArgumentException("Bad input matrix");
+		if (0.0 == r[0][0]) {
+			System.err.println("Warn: Bad inv44 input matrix");
+			return;
+		}
 
 		/* eliminate first variable */
 		m1 = r[1][0] / r[0][0];
@@ -170,8 +174,10 @@ public class MatInvAlgs {
 			swap(r, 3, 2);
 		if (Math.abs(r[2][1]) > Math.abs(r[1][1]))
 			swap(r, 2, 1);
-		if (0.0 == r[1][1])
-			throw new IllegalArgumentException("Bad input matrix");
+		if (0.0 == r[1][1]) {
+			System.err.println("Warn: Bad inv44 input matrix");
+			return;
+		}
 
 		/* eliminate second variable */
 		m2 = r[2][1] / r[1][1];
@@ -204,8 +210,10 @@ public class MatInvAlgs {
 		/* choose pivot - or die */
 		if (Math.abs(r[3][2]) > Math.abs(r[2][2]))
 			swap(r, 3, 2);
-		if (0.0 == r[2][2])
-			throw new IllegalArgumentException("Bad input matrix");
+		if (0.0 == r[2][2]) {
+			System.err.println("Warn: Bad inv44 input matrix");
+			return;
+		}
 
 		/* eliminate third variable */
 		m3 = r[3][2] / r[2][2];
@@ -216,8 +224,10 @@ public class MatInvAlgs {
 		r[3][7] -= m3 * r[2][7];
 
 		/* last check */
-		if (0.0 == r[3][3])
-			throw new IllegalArgumentException("Bad input matrix");
+		if (0.0 == r[3][3]) {
+			System.err.println("Warn: Bad inv44 input matrix");
+			return;
+		}
 
 		s = 1.0F / r[3][3]; /* now back substitute row 3 */
 		r[3][4] *= s;
