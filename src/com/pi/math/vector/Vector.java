@@ -180,15 +180,11 @@ public abstract class Vector {
 	}
 
 	public static Vector crossProduct(Vector dest, Vector u, Vector v) {
-		if (u.dimension() != 3 || v.dimension() != 3 || dest.dimension() != 3)
-			throw new IllegalArgumentException("Cross product is only valid in three dimensions");
 		return dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)), (u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
 	}
 
 	public static VectorBuff3 crossProduct(VectorBuff3 dest, VectorBuff3 u, VectorBuff3 v) {
-		if (u.dimension() != 3 || v.dimension() != 3 || dest.dimension() != 3)
-			throw new IllegalArgumentException("Cross product is only valid in three dimensions");
 		dest.setV((u.get(1) * v.get(2)) - (u.get(2) * v.get(1)), (u.get(2) * v.get(0)) - (u.get(0) * v.get(2)),
 				(u.get(0) * v.get(1)) - (u.get(1) * v.get(0)));
 		return dest;

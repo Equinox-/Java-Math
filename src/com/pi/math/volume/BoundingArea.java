@@ -98,4 +98,11 @@ public class BoundingArea {
 	public String toString() {
 		return "BoundingArea[min=" + min + ", max=" + max + ", rad=" + radius + "]";
 	}
+
+	public void set(BoundingArea area) {
+		this.max.set(area.max);
+		this.min.set(area.min);
+		this.center.set(area.center);
+		this.radius = area.radius;
+	}
 }
