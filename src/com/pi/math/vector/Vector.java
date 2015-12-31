@@ -159,6 +159,19 @@ public abstract class Vector {
 		return this;
 	}
 
+	public Vector linearComb(Vector a, float aC, Vector b, float bC, Vector c, float cC) {
+		for (int i = 0; i < Math.min(dimension(), Math.min(a.dimension(), Math.min(b.dimension(), c.dimension()))); i++)
+			set(i, a.get(i) * aC + b.get(i) * bC + c.get(i) * cC);
+		return this;
+	}
+
+	public Vector linearComb(Vector a, float aC, Vector b, float bC, Vector c, float cC, Vector d, float dC) {
+		for (int i = 0; i < Math.min(dimension(),
+				Math.min(Math.min(a.dimension(), b.dimension()), Math.min(c.dimension(), d.dimension()))); i++)
+			set(i, a.get(i) * aC + b.get(i) * bC + c.get(i) * cC + d.get(i) * dC);
+		return this;
+	}
+
 	/**
 	 * @return maximum component value
 	 */

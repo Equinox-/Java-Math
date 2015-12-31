@@ -8,6 +8,11 @@ public class VectorBuff extends Vector {
 	protected final FloatBuffer data;
 	private final int dimension;
 
+	public VectorBuff(VectorBuff f, int dim) {
+		this.data = f.data;
+		this.dimension = dim;
+	}
+
 	protected VectorBuff(FloatBuffer data, int offset, int dimension) {
 		this.dimension = dimension;
 		int ops = data.position();

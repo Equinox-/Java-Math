@@ -201,6 +201,13 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return (E) this;
 	}
 
+	public E linearComb(Matrix a, float af, Matrix b, float bf, Matrix cm, float cf, Matrix d, float df) {
+		for (int c = 0; c < columns; c++)
+			for (int r = 0; r < rows; r++)
+				set(r, c, a.get(r, c) * af + b.get(r, c) * bf + cm.get(r, c) * cf + d.get(r, c) * df);
+		return (E) this;
+	}
+
 	/**
 	 * this = m * this
 	 */
