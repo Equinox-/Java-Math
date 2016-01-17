@@ -108,6 +108,18 @@ public final class SpecialMatrix {
 		return m;
 	}
 
+	public static Trans3D translationAdd(final Trans3D m, final float x, final float y, final float z) {
+		m.mod(0, 3, x);
+		m.mod(1, 3, y);
+		m.mod(2, 3, z);
+
+		if (m.get(0, 3) == 0 && m.get(1, 3) == 0 && m.get(2, 3) == 0)
+			m.flags &= ~Trans3D.FLAG_TRANSLATION;
+		else if (m.get(0, 3) != 0 || m.get(1, 3) != 0 || m.get(2, 3) != 0)
+			m.flags |= Trans3D.FLAG_TRANSLATION;
+		return m;
+	}
+
 	public static Trans3D quaternion(final Trans3D m, final float w, final float x, final float y, final float z) {
 		float xx = x * x;
 		float xy = x * y;

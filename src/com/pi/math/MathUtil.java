@@ -3,6 +3,14 @@ package com.pi.math;
 import com.pi.math.vector.VectorBuff3;
 
 public class MathUtil {
+	/**
+	 * Unsigned floating point modulo. Ensures that the returned value is always
+	 * positive, even if <em>e</em> is positive.
+	 * 
+	 * @param a
+	 * @param mod
+	 * @return
+	 */
 	public static float uFmod(float a, float mod) {
 		return ((a % mod) + mod) % mod;
 	}

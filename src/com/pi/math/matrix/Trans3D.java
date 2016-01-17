@@ -139,6 +139,14 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		return (E) SpecialMatrix.translation(this, x, y, z);
 	}
 
+	public E addTranslation(final Vector a) {
+		return addTranslation(a.get(0), a.get(1), a.get(2));
+	}
+
+	public E addTranslation(final float x, final float y, final float z) {
+		return (E) SpecialMatrix.translationAdd(this, x, y, z);
+	}
+
 	public E setQuaternion(Vector q) {
 		return setQuaternion(q.get(0), q.get(1), q.get(2), q.get(3));
 	}
@@ -191,10 +199,10 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 			makeIdentity();
 		}
 		if (tmp != null) {
-			column(3).set(tmp);
+			setTranslation(tmp);
 			Heap.checkin(tmp);
 		} else if (columns > 3) {
-			column(3).setV(0, 0, 0, 1);
+			setTranslation(0, 0, 0);
 		}
 		flags = flhs | frhs;
 		return (E) this;
@@ -205,7 +213,7 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 			m.flags = FLAG_GENERAL;
 			super.invertInto(m).transposeInPlace();
 			if (m.columns() > 3)
-				m.column(3).setV(0, 0, 0, 1);
+				m.setTranslation(0, 0, 0);
 			if (m.rows() > 3)
 				for (int l = 0; l < 3; l++)
 					m.set(3, l, 0);
@@ -215,9 +223,9 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 		copyTo(m);
 		if (m.columns > 3)
 			if (m.rows > 3)
-				m.column(3).setV(0, 0, 0, 1);
+				m.setTranslation(0, 0, 0);
 			else
-				m.column(3).setV(0, 0, 0);
+				m.setTranslation(0, 0, 0);
 		return m;
 	}
 
@@ -323,7 +331,7 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 	public void setFlags() {
 		flags = computeFlags();
 	}
-	
+
 	public void flagTranslation() {
 		flags |= FLAG_TRANSLATION;
 	}
