@@ -199,10 +199,10 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 			makeIdentity();
 		}
 		if (tmp != null) {
-			setTranslation(tmp);
+			SpecialMatrix.translation(this, tmp.get(0), tmp.get(1), tmp.get(2));
 			Heap.checkin(tmp);
 		} else if (columns > 3) {
-			setTranslation(0, 0, 0);
+			SpecialMatrix.translation(this, 0, 0, 0);
 		}
 		flags = flhs | frhs;
 		return (E) this;
