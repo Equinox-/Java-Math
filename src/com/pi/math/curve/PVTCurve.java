@@ -20,6 +20,13 @@ public class PVTCurve {
 		this.v0 = new VectorND(new float[dimension]);
 	}
 
+	public void update(Vector p0, Vector p1, float dt) {
+		this.p0.set(p0);
+		this.v0.linearComb(p1, 1 / dt, p0, -1 / dt);
+		jerk.zero();
+		accel.zero();
+	}
+
 	public void update(Vector p0, Vector v0, Vector p1, Vector v1, float dt) {
 		this.p0.set(p0);
 		this.v0.set(v0);
