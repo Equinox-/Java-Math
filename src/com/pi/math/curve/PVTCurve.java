@@ -10,7 +10,7 @@ import com.pi.math.vector.VectorND;
  *
  */
 public class PVTCurve {
-	private final Vector jerk, accel;
+	public final Vector jerk, accel;
 	private final Vector p0, v0;
 
 	public PVTCurve(int dimension) {

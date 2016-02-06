@@ -19,6 +19,10 @@ public abstract class Vector {
 		set(d, get(d) + f);
 	}
 
+	public void mul(int d, float f) {
+		set(d, get(d) * f);
+	}
+
 	public abstract int dimension();
 
 	public Vector scale(float f, Vector v) {
