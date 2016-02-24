@@ -1,25 +1,13 @@
 package com.pi.math;
 
 public class FastMath {
-	public static float Q_rsqrt(float number) {
-		int i;
-		float x2, y;
-		final float threehalfs = 1.5F;
-
-		x2 = number * 0.5F;
-		y = number;
-		i = Float.floatToIntBits(y);
-		i = 0x5f3759df - (i >> 1); // what the fuck?
-		y = Float.intBitsToFloat(i);
-		y = y * (threehalfs - (x2 * y * y)); // 1st iteration
-		y = y * (threehalfs - (x2 * y * y)); // 2nd iteration, this can
-		// be removed
-
-		return y;
+	// Inbuilt methods are same speed
+	public static float rsqrt(float x) {
+		return 1 / (float) Math.sqrt(x);
 	}
 
-	public static float sqrt(float number) {
-		return (float) Math.sqrt(number);
+	public static float sqrt(float x) {
+		return (float) Math.sqrt(x);
 	}
 
 	public static int nextMultiple(int n, int mod) {
@@ -66,6 +54,7 @@ public class FastMath {
 		}
 	}
 
+	// These are ~25% faster than Math.cos/Math.sin
 	public static float cos(float v) {
 		float grads = Math.abs(v) / TAU;
 		int id = (int) ((grads - Math.floor(grads)) * TRIG_TABLE_SIZE);

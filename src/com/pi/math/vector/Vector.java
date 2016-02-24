@@ -146,7 +146,7 @@ public abstract class Vector {
 	}
 
 	public float invSqrt() {
-		return FastMath.Q_rsqrt(mag2());
+		return FastMath.rsqrt(mag2());
 	}
 
 	public Vector linearComb(float aC, Vector b, float bC) {
