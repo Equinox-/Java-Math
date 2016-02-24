@@ -126,12 +126,13 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 	}
 
 	public E setTranslation(final Vector a) {
-		return setTranslation(a.dimension() > 0 ? a.get(0) : 0, a.dimension() > 1 ? a.get(1) : 0,
-				a.dimension() > 2 ? a.get(2) : 0);
+		makeIdentity();
+		return (E) SpecialMatrix.translation(this, a);
 	}
 
 	public E setTranslation(final VectorBuff3 a) {
-		return setTranslation(a.get(0), a.get(1), a.get(2));
+		makeIdentity();
+		return (E) SpecialMatrix.translation(this, a);
 	}
 
 	public E setTranslation(final float x, final float y, final float z) {

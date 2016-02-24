@@ -5,6 +5,7 @@ import com.pi.math.Heap;
 import com.pi.math.vector.Quaternion;
 import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff;
+import com.pi.math.vector.VectorBuff3;
 import com.pi.math.vector.VectorBuff4;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -94,6 +95,14 @@ public final class SpecialMatrix {
 			m.flags &= ~Trans3D.FLAG_SCALING;
 
 		return m;
+	}
+
+	public static Trans3D translation(final Trans3D m, final Vector v) {
+		return translation(m, v.get(0), v.dimension() > 1 ? v.get(1) : 0, v.dimension() > 2 ? v.get(2) : 0);
+	}
+
+	public static Trans3D translation(final Trans3D m, final VectorBuff3 v) {
+		return translation(m, v.get(0), v.get(1), v.get(2));
 	}
 
 	public static Trans3D translation(final Trans3D m, final float x, final float y, final float z) {
@@ -225,6 +234,32 @@ public final class SpecialMatrix {
 
 	private static final Matrix4 tmp = new Matrix4();
 
+	/**
+	 * @param src
+	 *            Must have no scaling
+	 * @param quat
+	 *            Must be length 4
+	 */
+	public static void matrixToQuaternion(final Trans3D src, Vector quat) {
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+		// Method suggested by Christian.
+		final float m00 = src.get(0, 0);
+		final float m11 = src.get(1, 1);
+		final float m22 = src.get(2, 2);
+		quat.setV(1 + m00 + m11 + m22, 1 + m00 - m11 - m22, 1 - m00 + m11 - m22, 1 - m00 - m11 + m22);
+
+		// Max is theoretically un-needed; but it safeguards against rounding
+		// errors
+		for (int i = 0; i < quat.dimension(); i++)
+			quat.set(i, FastMath.sqrt(Math.max(0, quat.get(i))) / 2);
+		// Copy sign for xyz
+		quat.set(1, Math.copySign(quat.get(1), src.get(2, 1) - src.get(1, 2)));
+		quat.set(2, Math.copySign(quat.get(2), src.get(0, 2) - src.get(2, 0)));
+		quat.set(3, Math.copySign(quat.get(3), src.get(1, 0) - src.get(0, 1)));
+
+		quat.normalize();
+	}
+
 	public static void fromCompleteTransform(final Trans3D src, Vector eulerRot, Vector scale, Vector pos) {
 		// First decompose the scale: grab the translation
 		src.copyTo(tmp);
@@ -236,29 +271,10 @@ public final class SpecialMatrix {
 			for (int k = 0; k < 3; k++)
 				tmp.set(l, k, tmp.get(l, k) / scale.get(l));
 		}
-		// Decompose rotation. (This is finicky)
-		float tr = tmp.get(0, 0) + tmp.get(1, 1) + tmp.get(2, 2);
 
 		VectorBuff4 quat = Heap.checkout(4);
-		// TODO FIX FOR GENERAL CASE
-		if (tr > 0) {
-			float S = (float) Math.sqrt(tr + 1.0) * 2; // S=4*qw
-			quat.setV(0.25f * S, (tmp.get(9) - tmp.get(9)) / S, (tmp.get(8) - tmp.get(2)) / S,
-					(tmp.get(1) - tmp.get(4)) / S);
-		} else if ((tmp.get(0) > tmp.get(5)) & (tmp.get(0) > tmp.get(10))) {
-			float S = (float) Math.sqrt(1.0 + tmp.get(0) - tmp.get(5) - tmp.get(10)) * 2; // S=4*qx
-			quat.setV((tmp.get(9) - tmp.get(9)) / S, 0.25f * S, (tmp.get(4) + tmp.get(1)) / S,
-					(tmp.get(8) + tmp.get(2)) / S);
-		} else if (tmp.get(5) > tmp.get(10)) {
-			float S = (float) Math.sqrt(1.0 + tmp.get(5) - tmp.get(0) - tmp.get(10)) * 2; // S=4*qy
-			quat.setV((tmp.get(8) - tmp.get(2)) / S, (tmp.get(4) + tmp.get(1)) / S, 0.25f * S,
-					(tmp.get(9) + tmp.get(9)) / S);
-		} else {
-			float S = (float) Math.sqrt(1.0 + tmp.get(10) - tmp.get(0) - tmp.get(5)) * 2; // S=4*qz
-			quat.setV((tmp.get(1) - tmp.get(4)) / S, (tmp.get(8) + tmp.get(2)) / S, (tmp.get(9) + tmp.get(9)) / S,
-					0.25f * S);
-		}
-		quat.normalize();
+		matrixToQuaternion(tmp, quat);
+
 		Quaternion.toEulerAngles(quat, eulerRot);
 	}
 }

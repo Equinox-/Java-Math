@@ -57,6 +57,12 @@ public class Quaternion {
 		return quat;
 	}
 
+	public static Vector identity(Vector quat) {
+		checkDim(quat);
+		quat.setV(1, 0, 0, 0);
+		return quat;
+	}
+
 	public static Vector productInto(Vector lhs, Vector rhs) {
 		checkDim(lhs);
 		checkDim(rhs);

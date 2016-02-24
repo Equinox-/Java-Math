@@ -18,6 +18,10 @@ public class FastMath {
 		return y;
 	}
 
+	public static float sqrt(float number) {
+		return (float) Math.sqrt(number);
+	}
+
 	public static int nextMultiple(int n, int mod) {
 		return (int) (Math.ceil(n / (float) mod) * mod);
 	}
