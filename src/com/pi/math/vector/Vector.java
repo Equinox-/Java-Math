@@ -95,7 +95,7 @@ public abstract class Vector {
 	}
 
 	public final Vector normalize(Vector v) {
-		return linearComb(0, v, invSqrt());
+		return scale(v.invSqrt(), v);
 	}
 
 	public final Vector normalize() {
