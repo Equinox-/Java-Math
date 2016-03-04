@@ -81,23 +81,24 @@ public class VectorBuff3 extends VectorBuff {
 		return this;
 	}
 
-	private float[] tmp;
-
-	private final void fillTmp() {
-		data.position(0);
-		if (tmp == null)
-			tmp = new float[3];
-		data.get(tmp);
-		data.position(0);
-	}
-
 	public VectorBuff3 cross(VectorBuff3 a, VectorBuff3 b) {
-		a.fillTmp();
-		b.fillTmp();
-
-		data.put(0, (a.tmp[1] * b.tmp[2]) - (a.tmp[2] * b.tmp[1]));
-		data.put(1, (a.tmp[2] * b.tmp[0]) - (a.tmp[0] * b.tmp[2]));
-		data.put(2, (a.tmp[0] * b.tmp[1]) - (a.tmp[1] * b.tmp[0]));
+		if (this == a) {
+			final float a0 = a.get(0);
+			final float a1 = a.get(1);
+			data.put(0, (a.get(1) * b.get(2)) - (a.get(2) * b.get(1)));
+			data.put(1, (a.get(2) * b.get(0)) - (a0 * b.get(2)));
+			data.put(2, (a.get(0) * b.get(1)) - (a1 * b.get(0)));
+		} else if (this == b) {
+			final float b0 = b.get(0);
+			final float b1 = b.get(1);
+			data.put(0, (a.get(1) * b.get(2)) - (a.get(2) * b.get(1)));
+			data.put(1, (a.get(2) * b0) - (a.get(0) * b.get(2)));
+			data.put(2, (a.get(0) * b1) - (a.get(1) * b.get(0)));
+		} else {
+			data.put(0, (a.get(1) * b.get(2)) - (a.get(2) * b.get(1)));
+			data.put(1, (a.get(2) * b.get(0)) - (a.get(0) * b.get(2)));
+			data.put(2, (a.get(0) * b.get(1)) - (a.get(1) * b.get(0)));
+		}
 		return this;
 	}
 }

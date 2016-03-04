@@ -8,7 +8,7 @@ public abstract class Vector {
 
 	protected Vector() {
 		if (!Vector.ALLOW_ALLOCATION)
-			throw new RuntimeException("No allocation atm");
+			throw new IllegalStateException("Vector allocation disabled");
 	}
 
 	public abstract float get(int d);

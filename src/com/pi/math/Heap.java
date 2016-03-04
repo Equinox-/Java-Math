@@ -17,11 +17,33 @@ public class Heap {
 	private static final int[] VECTOR_HEAP_SIZE = new int[4];
 	private static final VectorBuff[][] VECTOR_HEAP = new VectorBuff[4][];
 
+	static {
+		for (int d = 0; d < VECTOR_HEAP.length; d++) {
+			VECTOR_HEAP[d] = new VectorBuff[d + 1 == 3 ? 128 : 16];
+			while (VECTOR_HEAP_SIZE[d] < VECTOR_HEAP[d].length)
+				VECTOR_HEAP[d][VECTOR_HEAP_SIZE[d]++] = VectorBuff.make(d + 1);
+		}
+	}
+
+	// 3D and 4D matrices
+	// 0 -> Matrix4, 1 -> Matrix3
+	private static final int[] MATRIX_HEAP_SIZE = new int[4];
+	private static final Matrix[][] MATRIX_HEAP = new Matrix[4][];
+
+	static {
+		for (int d = 0; d < MATRIX_HEAP.length; d++) {
+			MATRIX_HEAP[d] = new Matrix[8];
+			while (MATRIX_HEAP_SIZE[d] < MATRIX_HEAP[d].length)
+				MATRIX_HEAP[d][MATRIX_HEAP_SIZE[d]++] = makeM(d);
+		}
+	}
+
 	private static final boolean HEAP_WATCH = false;
+	private static final Map<Integer, Data> owner = new HashMap<>();
 
 	private static class Data {
-		StackTraceElement[] d;
-		Object o;
+		private StackTraceElement[] d;
+		private Object o;
 
 		public Data(Object o) {
 			this.o = o;
@@ -29,22 +51,12 @@ public class Heap {
 		}
 	}
 
-	private static final Map<Integer, Data> owner = new HashMap<>();
-
 	private static void watch(Object o) {
 		owner.put(System.identityHashCode(o), new Data(o));
 	}
 
 	private static void unwatch(Object o) {
 		owner.remove(System.identityHashCode(o));
-	}
-
-	static {
-		for (int d = 0; d < VECTOR_HEAP.length; d++) {
-			VECTOR_HEAP[d] = new VectorBuff[d + 1 == 3 ? 128 : 16];
-			while (VECTOR_HEAP_SIZE[d] < VECTOR_HEAP[d].length)
-				VECTOR_HEAP[d][VECTOR_HEAP_SIZE[d]++] = VectorBuff.make(d + 1);
-		}
 	}
 
 	public static <T extends VectorBuff> T checkout(int dim) {
@@ -76,11 +88,6 @@ public class Heap {
 		return (VectorBuff3) checkout(3);
 	}
 
-	// 3D and 4D matrices
-	// 0 -> Matrix4, 1 -> Matrix3
-	private static final int[] MATRIX_HEAP_SIZE = new int[4];
-	private static final Matrix[][] MATRIX_HEAP = new Matrix[4][];
-
 	private static Matrix makeM(int dim) {
 		switch (dim) {
 		case 0:
@@ -91,14 +98,6 @@ public class Heap {
 			return new Matrix34();
 		default:
 			return null;
-		}
-	}
-
-	static {
-		for (int d = 0; d < MATRIX_HEAP.length; d++) {
-			MATRIX_HEAP[d] = new Matrix[8];
-			while (MATRIX_HEAP_SIZE[d] < MATRIX_HEAP[d].length)
-				MATRIX_HEAP[d][MATRIX_HEAP_SIZE[d]++] = makeM(d);
 		}
 	}
 

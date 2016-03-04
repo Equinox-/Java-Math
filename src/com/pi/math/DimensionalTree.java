@@ -12,13 +12,13 @@ import com.pi.math.vector.VectorBuff3;
 import com.pi.math.volume.BoundingArea;
 
 public class DimensionalTree<E extends Positionable<VectorBuff3>> {
-	final BoundingArea area;
+	private final BoundingArea area;
 	private final int maxElements;
 
-	ArrayList<E> elements;
-	Set<VectorBuff> uniqElements;
+	private ArrayList<E> elements;
+	private Set<VectorBuff> uniqElements;
 
-	DimensionalTree<E>[] subTree = null;
+	private DimensionalTree<E>[] subTree = null;
 
 	public DimensionalTree(BoundingArea base, int maxE) {
 		this.area = base;

@@ -9,6 +9,9 @@ import com.pi.math.vector.Vector;
 import com.pi.math.vector.VectorBuff;
 
 public class Matrix34 extends Trans3D<Matrix34> {
+	// Matrix3 view. (Changes reflected)
+	private Matrix3 m3v;
+
 	public Matrix34() {
 		this(BufferProvider.createFloatBuffer(12), 0);
 	}
@@ -43,8 +46,6 @@ public class Matrix34 extends Trans3D<Matrix34> {
 		Heap.checkin(out);
 		return in;
 	}
-
-	private Matrix3 m3v;
 
 	public Matrix3 matrix3() {
 		if (m3v == null)
