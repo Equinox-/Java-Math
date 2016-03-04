@@ -41,7 +41,8 @@ public class FastMath {
 		return (int) (Math.ceil(n / (float) mod) * mod);
 	}
 
-	public static int nextPowerOf2(int n) {
+	public static int nextPowerOf2(int lpow2) {
+		int n = lpow2;
 		n--;
 		n |= n >> 1;
 		n |= n >> 2;

@@ -2,15 +2,47 @@ package com.pi.math.matrix;
 
 @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 public class MatrixBench {
+	private static final int COUNT = 100000;
+
+	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
+		bench(Matrix4.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix3.class);
+		System.out.println();
+		System.out.println();
+		bench(Matrix3.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix3.class);
+		System.out.println();
+		System.out.println();
+		bench(Matrix34.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix3.class);
+		System.out.println();
+	}
+
 	public static float randf() {
 		return (float) Math.random();
 	}
 
-	public static <E extends Matrix> E rand(Class<E> clazz) {
+	public static <E extends Matrix> E rand(Class<E> clazz) throws InstantiationException, IllegalAccessException {
 		return rand(clazz, 1);
 	}
 
-	public static <E extends Matrix> E rand(Class<E> clazz, boolean smart) {
+	public static <E extends Matrix> E rand(Class<E> clazz, boolean smart)
+			throws InstantiationException, IllegalAccessException {
 		E l = rand(clazz, 1);
 		if (l instanceof Trans3D)
 			((Trans3D) l).setFlags();
@@ -19,20 +51,15 @@ public class MatrixBench {
 		return l;
 	}
 
-	public static <E extends Matrix> E rand(Class<E> clazz, float cap) {
+	public static <E extends Matrix> E rand(Class<E> clazz, float cap)
+			throws InstantiationException, IllegalAccessException {
 		E r;
-		try {
-			r = clazz.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		r = clazz.newInstance();
 		for (int i = 0; i < r.columns(); i++)
 			for (int j = 0; j < r.rows(); j++)
 				r.set(j, i, randf() * cap);
 		return r;
 	}
-
-	private static final int COUNT = 100000;
 
 	private static String ttl(Class<? extends Matrix> genA, Class<? extends Matrix> genB, String op) {
 		return genA.getSimpleName() + " " + op + " " + genB.getSimpleName() + ": ";
@@ -104,7 +131,7 @@ public class MatrixBench {
 			}
 	}
 
-	public static void bench(Class<? extends Matrix> genA) {
+	public static void bench(Class<? extends Matrix> genA) throws InstantiationException, IllegalAccessException {
 		{
 			long begin = System.nanoTime();
 			for (int k = 0; k < COUNT; k++) {
@@ -140,38 +167,5 @@ public class MatrixBench {
 			}
 			System.out.println(ttl(genA, "setFlags") + (System.nanoTime() - begin) / COUNT + " ns/op");
 		}
-	}
-
-	public static void main(String[] args) {
-		bench(Matrix4.class);
-		System.out.println();
-		bench(Matrix4.class, Matrix4.class);
-		System.out.println();
-		bench(Matrix4.class, Matrix34.class);
-		System.out.println();
-		bench(Matrix4.class, Matrix3.class);
-		System.out.println();
-		System.out.println();
-		bench(Matrix3.class);
-		System.out.println();
-		bench(Matrix3.class, Matrix4.class);
-		System.out.println();
-		bench(Matrix3.class, Matrix34.class);
-		System.out.println();
-		bench(Matrix3.class, Matrix3.class);
-		System.out.println();
-		System.out.println();
-		bench(Matrix34.class);
-		System.out.println();
-		bench(Matrix34.class, Matrix4.class);
-		System.out.println();
-		bench(Matrix34.class, Matrix34.class);
-		System.out.println();
-		bench(Matrix34.class, Matrix3.class);
-		System.out.println();
-
-		for (int l = 1; l <= 1000; l *= 10)
-			System.out.println(
-					Matrix.toString(rand(Matrix3.class, l), rand(Matrix34.class, l), rand(Matrix4.class, l)) + "\n");
 	}
 }

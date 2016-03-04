@@ -10,6 +10,8 @@ import com.pi.math.vector.VectorBuff4;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class SpecialMatrix {
+	private static final Matrix4 fromCompleteTransform_TEMP = new Matrix4();
+
 	private static void makeID3(Trans3D m) {
 		if (m.flags == Trans3D.FLAG_IDENTITY)
 			return;
@@ -232,8 +234,6 @@ public final class SpecialMatrix {
 		return dest;
 	}
 
-	private static final Matrix4 tmp = new Matrix4();
-
 	/**
 	 * @param src
 	 *            Must have no scaling
@@ -262,18 +262,18 @@ public final class SpecialMatrix {
 
 	public static void fromCompleteTransform(final Trans3D src, Vector eulerRot, Vector scale, Vector pos) {
 		// First decompose the scale: grab the translation
-		src.copyTo(tmp);
+		src.copyTo(fromCompleteTransform_TEMP);
 		// Decompose scale
-		pos.setV(tmp.get(0, 3), tmp.get(1, 3), tmp.get(2, 3));
+		pos.setV(fromCompleteTransform_TEMP.get(0, 3), fromCompleteTransform_TEMP.get(1, 3), fromCompleteTransform_TEMP.get(2, 3));
 		for (int l = 0; l < 3; l++) {
 			scale.set(l, (float) Math.sqrt(
-					tmp.get(l, 0) * tmp.get(l, 0) + tmp.get(l, 1) * tmp.get(l, 1) + tmp.get(l, 2) * tmp.get(l, 2)));
+					fromCompleteTransform_TEMP.get(l, 0) * fromCompleteTransform_TEMP.get(l, 0) + fromCompleteTransform_TEMP.get(l, 1) * fromCompleteTransform_TEMP.get(l, 1) + fromCompleteTransform_TEMP.get(l, 2) * fromCompleteTransform_TEMP.get(l, 2)));
 			for (int k = 0; k < 3; k++)
-				tmp.set(l, k, tmp.get(l, k) / scale.get(l));
+				fromCompleteTransform_TEMP.set(l, k, fromCompleteTransform_TEMP.get(l, k) / scale.get(l));
 		}
 
 		VectorBuff4 quat = Heap.checkout(4);
-		matrixToQuaternion(tmp, quat);
+		matrixToQuaternion(fromCompleteTransform_TEMP, quat);
 
 		Quaternion.toEulerAngles(quat, eulerRot);
 	}
