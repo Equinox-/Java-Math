@@ -4,18 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 public abstract class BufferProvider {
-	private static class DefaultBufferProvider extends BufferProvider {
-		@Override
-		protected ByteBuffer nByteBuffer(int n) {
-			return ByteBuffer.allocateDirect(n);
-		}
-
-		@Override
-		protected FloatBuffer nFloatBuffer(int n) {
-			return ByteBuffer.allocateDirect(n * 4).asFloatBuffer();
-		}
-	}
-
 	private static BufferProvider provider = new DefaultBufferProvider();
 
 	public static ByteBuffer createByteBuffer(int n) {
@@ -33,4 +21,16 @@ public abstract class BufferProvider {
 	protected abstract ByteBuffer nByteBuffer(int n);
 
 	protected abstract FloatBuffer nFloatBuffer(int n);
+
+	private static class DefaultBufferProvider extends BufferProvider {
+		@Override
+		protected ByteBuffer nByteBuffer(int n) {
+			return ByteBuffer.allocateDirect(n);
+		}
+
+		@Override
+		protected FloatBuffer nFloatBuffer(int n) {
+			return ByteBuffer.allocateDirect(n * 4).asFloatBuffer();
+		}
+	}
 }

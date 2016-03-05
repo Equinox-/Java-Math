@@ -13,18 +13,8 @@ import com.pi.math.vector.VectorBuff3;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class Heap {
-	private static class Data {
-		private StackTraceElement[] d;
-		private Object o;
-
-		public Data(Object o) {
-			this.o = o;
-			this.d = Thread.currentThread().getStackTrace();
-		}
-	}
 	// 1-4D vectors
 	private static final int[] VECTOR_HEAP_SIZE = new int[4];
-
 	private static final VectorBuff[][] VECTOR_HEAP = new VectorBuff[4][];
 
 	static {
@@ -34,10 +24,10 @@ public class Heap {
 				VECTOR_HEAP[d][VECTOR_HEAP_SIZE[d]++] = VectorBuff.make(d + 1);
 		}
 	}
+
 	// 3D and 4D matrices
 	// 0 -> Matrix4, 1 -> Matrix3
 	private static final int[] MATRIX_HEAP_SIZE = new int[4];
-
 	private static final Matrix[][] MATRIX_HEAP = new Matrix[4][];
 
 	static {
@@ -47,8 +37,8 @@ public class Heap {
 				MATRIX_HEAP[d][MATRIX_HEAP_SIZE[d]++] = makeM(d);
 		}
 	}
-	private static final boolean HEAP_WATCH = false;
 
+	private static final boolean HEAP_WATCH = false;
 	private static final Map<Integer, Data> owner = new HashMap<>();
 
 	public static void checkin(Matrix... vs) {
@@ -163,5 +153,15 @@ public class Heap {
 
 	private static void watch(Object o) {
 		owner.put(System.identityHashCode(o), new Data(o));
+	}
+
+	private static class Data {
+		private StackTraceElement[] d;
+		private Object o;
+
+		public Data(Object o) {
+			this.o = o;
+			this.d = Thread.currentThread().getStackTrace();
+		}
 	}
 }
