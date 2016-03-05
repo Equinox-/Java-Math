@@ -3,24 +3,6 @@ package com.pi.math;
 import com.pi.math.vector.VectorBuff3;
 
 public class MathUtil {
-	/**
-	 * Unsigned floating point modulo. Ensures that the returned value is always
-	 * positive, even if <em>e</em> is positive.
-	 * 
-	 * @param a
-	 * @param mod
-	 * @return
-	 */
-	public static float uFmod(float a, float mod) {
-		return ((a % mod) + mod) % mod;
-	}
-
-	private static VectorBuff3 subtract(VectorBuff3 lhs, VectorBuff3 rhs) {
-		VectorBuff3 dest = Heap.checkout(3);
-		dest.linearComb(lhs, 1, rhs, -1);
-		return dest;
-	}
-
 	public static VectorBuff3 getPointOnRay(VectorBuff3 dest, VectorBuff3 origin, VectorBuff3 normal,
 			VectorBuff3 near) {
 		VectorBuff3 pointNormal = subtract(near, origin);
@@ -46,6 +28,126 @@ public class MathUtil {
 		if (cX < 0 || cX > height)
 			return Float.NaN; // Doesn't hit segment.
 		return t;
+	}
+
+	public static boolean rayIntersectsBox(VectorBuff3 O, VectorBuff3 D, VectorBuff3 min, VectorBuff3 max) {
+		VectorBuff3 maxT = Heap.checkout(3);
+		try {
+			boolean inside = true;
+			for (int i = 0; i < maxT.dimension(); i++)
+				maxT.set(i, -1);
+
+			// Find candidate planes.
+			for (int i = 0; i < 3; i++) {
+				if (O.get(i) < min.get(i)) {
+					inside = false;
+					if (Math.abs(D.get(i)) > EpsMath.EPSILON)
+						maxT.set(i, (min.get(i) - O.get(i)) / D.get(i));
+				} else if (O.get(i) > max.get(i)) {
+					inside = false;
+					if (Math.abs(D.get(i)) > EpsMath.EPSILON)
+						maxT.set(i, (max.get(i) - O.get(i)) / D.get(i));
+				}
+			}
+
+			// Ray origin inside bounding box
+			if (inside) {
+				return true;
+			}
+
+			// Get largest of the maxT's for final choice of intersection
+			int plane = 0;
+			if (maxT.get(1) > maxT.get(plane))
+				plane = 1;
+			if (maxT.get(2) > maxT.get(plane))
+				plane = 2;
+
+			// Check final candidate actually inside box
+			if (maxT.get(plane) < 0)
+				return false;
+
+			for (int i = 0; i < 3; i++) {
+				if (i != plane) {
+					float cd = O.get(i) + maxT.get(plane) * D.get(i);
+					if (cd < min.get(i) - EpsMath.EPSILON || cd > max.get(i) + EpsMath.EPSILON)
+						return false;
+				}
+			}
+			return true; // ray hits box
+		} finally {
+			Heap.checkin(maxT);
+		}
+	}
+
+	public static boolean rayIntersectsSphere(VectorBuff3 O, VectorBuff3 D, VectorBuff3 center, float radius) {
+		VectorBuff3 oMC = subtract(O, center);
+		float b = D.dot(oMC);
+		float c = D.mag2() * (oMC.mag2() - radius * radius);
+		Heap.checkin(oMC);
+		return (b * b - c) > -EpsMath.EPSILON;
+	}
+
+	public static VectorBuff3 rayIntersectsTriangle(VectorBuff3 dest, VectorBuff3 O, VectorBuff3 D, VectorBuff3 v0,
+			VectorBuff3 v1, VectorBuff3 v2) {
+		// Moller-Trumbore ray-triangle intersection algorithm
+		// http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+
+		VectorBuff3 e1 = null, e2 = null; // Edge1, Edge2
+		VectorBuff3 P = null, Q = null, T = null;
+		float det, inv_det, u, v;
+		float t;
+
+		try {
+			// Find vectors for two edges sharing V1
+			e1 = subtract(v1, v0);
+			e2 = subtract(v2, v0);
+			// Begin calculating determinant - also used to calculate u
+			// parameter
+			P = Heap.checkout(3);
+			P.cross(D, e2);
+
+			// if determinant is near zero, ray lies in plane of triangle
+			det = e1.dot(P);
+			if (det > -EpsMath.EPSILON && det < EpsMath.EPSILON)
+				return null;
+			inv_det = 1.f / det;
+
+			// calculate distance from V1 to ray origin
+			T = subtract(O, v0);
+
+			// Calculate u parameter and test bound
+			u = T.dot(P) * inv_det;
+			// The intersection lies outside of the triangle
+			if (u < 0.f || u > 1.f)
+				return null;
+
+			// Prepare to test v parameter
+			Q = Heap.checkout(3);
+			Q.cross(T, e1);
+
+			// Calculate V parameter and test bound
+			v = D.dot(Q) * inv_det;
+			// The intersection lies outside of the triangle
+			if (v < 0.f || u + v > 1.f)
+				return null;
+
+			t = e2.dot(Q) * inv_det;
+
+			if (t > EpsMath.EPSILON) { // ray intersection
+				return dest.linearComb(O, 1, D, t);
+			}
+
+			// No hit, no win
+			return null;
+		} finally {
+			Heap.checkin(e1);
+			Heap.checkin(e2);
+			Heap.checkin(P);
+			if (T != null)
+				Heap.checkin(T);
+			if (Q != null)
+				Heap.checkin(Q);
+		}
 	}
 
 	public static float segmentDistanceSegment(final VectorBuff3 rayA, final VectorBuff3 rayB, final VectorBuff3 segA,
@@ -117,123 +219,21 @@ public class MathUtil {
 		return fv;
 	}
 
-	public static VectorBuff3 rayIntersectsTriangle(VectorBuff3 dest, VectorBuff3 O, VectorBuff3 D, VectorBuff3 v0,
-			VectorBuff3 v1, VectorBuff3 v2) {
-		// Moller-Trumbore ray-triangle intersection algorithm
-		// http://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-
-		VectorBuff3 e1 = null, e2 = null; // Edge1, Edge2
-		VectorBuff3 P = null, Q = null, T = null;
-		float det, inv_det, u, v;
-		float t;
-
-		try {
-			// Find vectors for two edges sharing V1
-			e1 = subtract(v1, v0);
-			e2 = subtract(v2, v0);
-			// Begin calculating determinant - also used to calculate u
-			// parameter
-			P = Heap.checkout(3);
-			P.cross(D, e2);
-
-			// if determinant is near zero, ray lies in plane of triangle
-			det = e1.dot(P);
-			if (det > -EpsMath.EPSILON && det < EpsMath.EPSILON)
-				return null;
-			inv_det = 1.f / det;
-
-			// calculate distance from V1 to ray origin
-			T = subtract(O, v0);
-
-			// Calculate u parameter and test bound
-			u = T.dot(P) * inv_det;
-			// The intersection lies outside of the triangle
-			if (u < 0.f || u > 1.f)
-				return null;
-
-			// Prepare to test v parameter
-			Q = Heap.checkout(3);
-			Q.cross(T, e1);
-
-			// Calculate V parameter and test bound
-			v = D.dot(Q) * inv_det;
-			// The intersection lies outside of the triangle
-			if (v < 0.f || u + v > 1.f)
-				return null;
-
-			t = e2.dot(Q) * inv_det;
-
-			if (t > EpsMath.EPSILON) { // ray intersection
-				return dest.linearComb(O, 1, D, t);
-			}
-
-			// No hit, no win
-			return null;
-		} finally {
-			Heap.checkin(e1);
-			Heap.checkin(e2);
-			Heap.checkin(P);
-			if (T != null)
-				Heap.checkin(T);
-			if (Q != null)
-				Heap.checkin(Q);
-		}
+	private static VectorBuff3 subtract(VectorBuff3 lhs, VectorBuff3 rhs) {
+		VectorBuff3 dest = Heap.checkout(3);
+		dest.linearComb(lhs, 1, rhs, -1);
+		return dest;
 	}
 
-	public static boolean rayIntersectsSphere(VectorBuff3 O, VectorBuff3 D, VectorBuff3 center, float radius) {
-		VectorBuff3 oMC = subtract(O, center);
-		float b = D.dot(oMC);
-		float c = D.mag2() * (oMC.mag2() - radius * radius);
-		Heap.checkin(oMC);
-		return (b * b - c) > -EpsMath.EPSILON;
-	}
-
-	public static boolean rayIntersectsBox(VectorBuff3 O, VectorBuff3 D, VectorBuff3 min, VectorBuff3 max) {
-		VectorBuff3 maxT = Heap.checkout(3);
-		try {
-			boolean inside = true;
-			for (int i = 0; i < maxT.dimension(); i++)
-				maxT.set(i, -1);
-
-			// Find candidate planes.
-			for (int i = 0; i < 3; i++) {
-				if (O.get(i) < min.get(i)) {
-					inside = false;
-					if (Math.abs(D.get(i)) > EpsMath.EPSILON)
-						maxT.set(i, (min.get(i) - O.get(i)) / D.get(i));
-				} else if (O.get(i) > max.get(i)) {
-					inside = false;
-					if (Math.abs(D.get(i)) > EpsMath.EPSILON)
-						maxT.set(i, (max.get(i) - O.get(i)) / D.get(i));
-				}
-			}
-
-			// Ray origin inside bounding box
-			if (inside) {
-				return true;
-			}
-
-			// Get largest of the maxT's for final choice of intersection
-			int plane = 0;
-			if (maxT.get(1) > maxT.get(plane))
-				plane = 1;
-			if (maxT.get(2) > maxT.get(plane))
-				plane = 2;
-
-			// Check final candidate actually inside box
-			if (maxT.get(plane) < 0)
-				return false;
-
-			for (int i = 0; i < 3; i++) {
-				if (i != plane) {
-					float cd = O.get(i) + maxT.get(plane) * D.get(i);
-					if (cd < min.get(i) - EpsMath.EPSILON || cd > max.get(i) + EpsMath.EPSILON)
-						return false;
-				}
-			}
-			return true; // ray hits box
-		} finally {
-			Heap.checkin(maxT);
-		}
+	/**
+	 * Unsigned floating point modulo. Ensures that the returned value is always
+	 * positive, even if <em>e</em> is positive.
+	 * 
+	 * @param a
+	 * @param mod
+	 * @return
+	 */
+	public static float uFmod(float a, float mod) {
+		return ((a % mod) + mod) % mod;
 	}
 }

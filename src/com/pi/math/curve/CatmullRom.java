@@ -3,16 +3,6 @@ package com.pi.math.curve;
 import com.pi.math.vector.Vector;
 
 public class CatmullRom implements Curve {
-	private final CubicBezier[] arches;
-
-	public CatmullRom(Vector... pts) {
-		arches = new CubicBezier[pts.length - 1];
-		for (int i = 0; i < pts.length - 1; i++) {
-			arches[i] = makeArch(i > 0 ? pts[i - 1] : null, pts[i], pts[i + 1],
-					i < pts.length - 2 ? pts[i + 2] : null);
-		}
-	}
-
 	/**
 	 * Creates an arch between two points, with the given secondary biases.
 	 * 
@@ -38,6 +28,16 @@ public class CatmullRom implements Curve {
 			c = pt2.linearComb(1, after.linearComb(1, pt1, -1), -1f / 6f);
 		}
 		return new CubicBezier(pt1, b, c, pt2);
+	}
+
+	private final CubicBezier[] arches;
+
+	public CatmullRom(Vector... pts) {
+		arches = new CubicBezier[pts.length - 1];
+		for (int i = 0; i < pts.length - 1; i++) {
+			arches[i] = makeArch(i > 0 ? pts[i - 1] : null, pts[i], pts[i + 1],
+					i < pts.length - 2 ? pts[i + 2] : null);
+		}
 	}
 
 	@Override

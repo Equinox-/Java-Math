@@ -15,12 +15,12 @@ public final class Matrix3 extends Trans3D<Matrix3> {
 		super(f, offset, 3, 3);
 	}
 
-	public Matrix3(FloatBuffer f, int offset) {
-		super(f, offset, 3, 3);
-	}
-
 	public Matrix3(FloatBuffer f) {
 		this(f, 0);
+	}
+
+	public Matrix3(FloatBuffer f, int offset) {
+		super(f, offset, 3, 3);
 	}
 
 	@Override

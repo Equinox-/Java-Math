@@ -4,69 +4,42 @@ package com.pi.math.matrix;
 public class MatrixBench {
 	private static final int COUNT = 100000;
 
-	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
-		bench(Matrix4.class);
-		System.out.println();
-		bench(Matrix4.class, Matrix4.class);
-		System.out.println();
-		bench(Matrix4.class, Matrix34.class);
-		System.out.println();
-		bench(Matrix4.class, Matrix3.class);
-		System.out.println();
-		System.out.println();
-		bench(Matrix3.class);
-		System.out.println();
-		bench(Matrix3.class, Matrix4.class);
-		System.out.println();
-		bench(Matrix3.class, Matrix34.class);
-		System.out.println();
-		bench(Matrix3.class, Matrix3.class);
-		System.out.println();
-		System.out.println();
-		bench(Matrix34.class);
-		System.out.println();
-		bench(Matrix34.class, Matrix4.class);
-		System.out.println();
-		bench(Matrix34.class, Matrix34.class);
-		System.out.println();
-		bench(Matrix34.class, Matrix3.class);
-		System.out.println();
-	}
-
-	public static float randf() {
-		return (float) Math.random();
-	}
-
-	public static <E extends Matrix> E rand(Class<E> clazz) throws InstantiationException, IllegalAccessException {
-		return rand(clazz, 1);
-	}
-
-	public static <E extends Matrix> E rand(Class<E> clazz, boolean smart)
-			throws InstantiationException, IllegalAccessException {
-		E l = rand(clazz, 1);
-		if (l instanceof Trans3D)
-			((Trans3D) l).setFlags();
-		if (!smart)
-			((Trans3D) l).flags = Trans3D.FLAG_GENERAL;
-		return l;
-	}
-
-	public static <E extends Matrix> E rand(Class<E> clazz, float cap)
-			throws InstantiationException, IllegalAccessException {
-		E r;
-		r = clazz.newInstance();
-		for (int i = 0; i < r.columns(); i++)
-			for (int j = 0; j < r.rows(); j++)
-				r.set(j, i, randf() * cap);
-		return r;
-	}
-
-	private static String ttl(Class<? extends Matrix> genA, Class<? extends Matrix> genB, String op) {
-		return genA.getSimpleName() + " " + op + " " + genB.getSimpleName() + ": ";
-	}
-
-	private static String ttl(Class<? extends Matrix> genA, String op) {
-		return genA.getSimpleName() + " " + op + ": ";
+	public static void bench(Class<? extends Matrix> genA) throws InstantiationException, IllegalAccessException {
+		{
+			long begin = System.nanoTime();
+			for (int k = 0; k < COUNT; k++) {
+				Matrix res = rand(genA).makeIdentity();
+			}
+			System.out.println(ttl(genA, "identity") + (System.nanoTime() - begin) / COUNT + " ns/op");
+		}
+		{
+			long begin = System.nanoTime();
+			for (int k = 0; k < COUNT; k++) {
+				Matrix res = rand(genA).makeZero();
+			}
+			System.out.println(ttl(genA, "zero") + (System.nanoTime() - begin) / COUNT + " ns/op");
+		}
+		{
+			long begin = System.nanoTime();
+			for (int k = 0; k < COUNT; k++) {
+				Matrix res = rand(genA).multiply(randf());
+			}
+			System.out.println(ttl(genA, "scalar") + (System.nanoTime() - begin) / COUNT + " ns/op");
+		}
+		{
+			long begin = System.nanoTime();
+			for (int k = 0; k < COUNT; k++) {
+				Matrix res = rand(genA).transposeInPlace();
+			}
+			System.out.println(ttl(genA, "transp") + (System.nanoTime() - begin) / COUNT + " ns/op");
+		}
+		if (Trans3D.class.isAssignableFrom(genA)) {
+			long begin = System.nanoTime();
+			for (int k = 0; k < COUNT; k++) {
+				((Trans3D) rand(genA)).setFlags();
+			}
+			System.out.println(ttl(genA, "setFlags") + (System.nanoTime() - begin) / COUNT + " ns/op");
+		}
 	}
 
 	public static void bench(Class<? extends Matrix> genA, Class<? extends Matrix> genB) {
@@ -131,41 +104,68 @@ public class MatrixBench {
 			}
 	}
 
-	public static void bench(Class<? extends Matrix> genA) throws InstantiationException, IllegalAccessException {
-		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).makeIdentity();
-			}
-			System.out.println(ttl(genA, "identity") + (System.nanoTime() - begin) / COUNT + " ns/op");
-		}
-		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).makeZero();
-			}
-			System.out.println(ttl(genA, "zero") + (System.nanoTime() - begin) / COUNT + " ns/op");
-		}
-		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).multiply(randf());
-			}
-			System.out.println(ttl(genA, "scalar") + (System.nanoTime() - begin) / COUNT + " ns/op");
-		}
-		{
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				Matrix res = rand(genA).transposeInPlace();
-			}
-			System.out.println(ttl(genA, "transp") + (System.nanoTime() - begin) / COUNT + " ns/op");
-		}
-		if (Trans3D.class.isAssignableFrom(genA)) {
-			long begin = System.nanoTime();
-			for (int k = 0; k < COUNT; k++) {
-				((Trans3D) rand(genA)).setFlags();
-			}
-			System.out.println(ttl(genA, "setFlags") + (System.nanoTime() - begin) / COUNT + " ns/op");
-		}
+	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
+		bench(Matrix4.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix4.class, Matrix3.class);
+		System.out.println();
+		System.out.println();
+		bench(Matrix3.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix3.class, Matrix3.class);
+		System.out.println();
+		System.out.println();
+		bench(Matrix34.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix4.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix34.class);
+		System.out.println();
+		bench(Matrix34.class, Matrix3.class);
+		System.out.println();
+	}
+
+	public static <E extends Matrix> E rand(Class<E> clazz) throws InstantiationException, IllegalAccessException {
+		return rand(clazz, 1);
+	}
+
+	public static <E extends Matrix> E rand(Class<E> clazz, boolean smart)
+			throws InstantiationException, IllegalAccessException {
+		E l = rand(clazz, 1);
+		if (l instanceof Trans3D)
+			((Trans3D) l).setFlags();
+		if (!smart)
+			((Trans3D) l).flags = Trans3D.FLAG_GENERAL;
+		return l;
+	}
+
+	public static <E extends Matrix> E rand(Class<E> clazz, float cap)
+			throws InstantiationException, IllegalAccessException {
+		E r;
+		r = clazz.newInstance();
+		for (int i = 0; i < r.columns(); i++)
+			for (int j = 0; j < r.rows(); j++)
+				r.set(j, i, randf() * cap);
+		return r;
+	}
+
+	public static float randf() {
+		return (float) Math.random();
+	}
+
+	private static String ttl(Class<? extends Matrix> genA, Class<? extends Matrix> genB, String op) {
+		return genA.getSimpleName() + " " + op + " " + genB.getSimpleName() + ": ";
+	}
+
+	private static String ttl(Class<? extends Matrix> genA, String op) {
+		return genA.getSimpleName() + " " + op + ": ";
 	}
 }

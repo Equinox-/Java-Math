@@ -23,18 +23,18 @@ public class FastMath {
 		return COSINE_TABLE[id];
 	}
 
-	public static float sin(float v) {
-		float grads = Math.abs(v) / TAU;
-		int id = (int) ((grads - Math.floor(grads)) * TRIG_TABLE_SIZE);
-		return Math.signum(v) * SINE_TABLE[id];
+	public static boolean isPowerOf2(int i) {
+		return (i > 0) && (i & (i - 1)) == 0;
 	}
 
-	public static float rsqrt(float x) {
-		return 1 / (float) Math.sqrt(x);
-	}
-
-	public static float sqrt(float x) {
-		return (float) Math.sqrt(x);
+	public static int nextBit(int data, int start, int dir) {
+		final int sizeof = (1 << 4);
+		for (int k = 1; k < sizeof; k++) {
+			int bit = (start + k * dir + sizeof) & (sizeof - 1);
+			if ((data & (1 << bit)) != 0)
+				return bit;
+		}
+		return -1;
 	}
 
 	public static int nextMultiple(int n, int mod) {
@@ -53,17 +53,17 @@ public class FastMath {
 		return n;
 	}
 
-	public static boolean isPowerOf2(int i) {
-		return (i > 0) && (i & (i - 1)) == 0;
+	public static float rsqrt(float x) {
+		return 1 / (float) Math.sqrt(x);
 	}
 
-	public static int nextBit(int data, int start, int dir) {
-		final int sizeof = (1 << 4);
-		for (int k = 1; k < sizeof; k++) {
-			int bit = (start + k * dir + sizeof) & (sizeof - 1);
-			if ((data & (1 << bit)) != 0)
-				return bit;
-		}
-		return -1;
+	public static float sin(float v) {
+		float grads = Math.abs(v) / TAU;
+		int id = (int) ((grads - Math.floor(grads)) * TRIG_TABLE_SIZE);
+		return Math.signum(v) * SINE_TABLE[id];
+	}
+
+	public static float sqrt(float x) {
+		return (float) Math.sqrt(x);
 	}
 }

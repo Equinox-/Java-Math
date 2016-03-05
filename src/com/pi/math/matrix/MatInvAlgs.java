@@ -7,6 +7,19 @@ import java.util.function.Supplier;
 // If the matrix is orthogonal (columns&rows are orthogonal and unit) the
 // inverse is the transpose
 public class MatInvAlgs {
+	private static final ThreadLocal<float[][]> localRows = ThreadLocal.withInitial(new Supplier<float[][]>() {
+		@Override
+		public float[][] get() {
+			return new float[4][8];
+		}
+	});
+
+	static void inv33(Matrix out, Matrix in) {
+		if (out.rows() > 3 || out.columns() > 3)
+			out.makeIdentity();
+		inv33Core(out, in);
+	}
+
 	private static void inv33Core(Matrix out, Matrix in) {
 		float pos, neg, t;
 		float det;
@@ -71,12 +84,6 @@ public class MatInvAlgs {
 		out.set(2, 2, ((in.get(0, 0) * in.get(1, 1) - in.get(1, 0) * in.get(0, 1)) * det));
 	}
 
-	static void inv33(Matrix out, Matrix in) {
-		if (out.rows() > 3 || out.columns() > 3)
-			out.makeIdentity();
-		inv33Core(out, in);
-	}
-
 	static void inv34(Matrix out, Matrix in) {
 		if (out.rows() > 3 || out.columns() > 4)
 			out.makeIdentity();
@@ -87,19 +94,6 @@ public class MatInvAlgs {
 		out.set(1, 3, -(in.get(0, 3) * out.get(1, 0) + in.get(1, 3) * out.get(1, 1) + in.get(2, 3) * out.get(1, 2)));
 		out.set(2, 3, -(in.get(0, 3) * out.get(2, 0) + in.get(1, 3) * out.get(2, 1) + in.get(2, 3) * out.get(2, 2)));
 	}
-
-	private static final void swap(float[][] t, int a, int b) {
-		float[] k = t[a];
-		t[a] = t[b];
-		t[b] = k;
-	}
-
-	private static final ThreadLocal<float[][]> localRows = ThreadLocal.withInitial(new Supplier<float[][]>() {
-		@Override
-		public float[][] get() {
-			return new float[4][8];
-		}
-	});
 
 	static void inv44(Matrix out, Matrix m) {
 		if (out.rows() > 4 || out.columns() > 4)
@@ -274,5 +268,11 @@ public class MatInvAlgs {
 		for (int i = 0; i < 4; i++)
 			for (int j = 0; j < 4; j++)
 				out.safeSet(i, j, r[i][j + 4]);
+	}
+
+	private static final void swap(float[][] t, int a, int b) {
+		float[] k = t[a];
+		t[a] = t[b];
+		t[b] = k;
 	}
 }

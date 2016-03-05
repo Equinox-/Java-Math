@@ -16,12 +16,24 @@ public final class Matrix4 extends Trans3D<Matrix4> {
 		super(f, offset, 4, 4);
 	}
 
+	public Matrix4(FloatBuffer f) {
+		this(f, 0);
+	}
+
 	public Matrix4(FloatBuffer f, int offset) {
 		super(f, offset, 4, 4);
 	}
 
-	public Matrix4(FloatBuffer f) {
-		this(f, 0);
+	// Matrix operations
+	public Matrix4 makeMatrix3() {
+		set(3, 0);
+		set(7, 0);
+		set(11, 0);
+		set(12, 0);
+		set(13, 0);
+		set(14, 0);
+		set(15, 1);
+		return this;
 	}
 
 	// Math operations
@@ -40,27 +52,15 @@ public final class Matrix4 extends Trans3D<Matrix4> {
 		return outset;
 	}
 
-	public VectorBuff3 transform4(VectorBuff3 outset, final VectorBuff3 inset) {
-		for (int k = 0; k < 3; k++)
-			outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2) + get(12 + k));
-		return outset;
-	}
-
 	public VectorBuff3 transform3(VectorBuff3 outset, final VectorBuff3 inset) {
 		for (int k = 0; k < 3; k++)
 			outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2));
 		return outset;
 	}
 
-	// Matrix operations
-	public Matrix4 makeMatrix3() {
-		set(3, 0);
-		set(7, 0);
-		set(11, 0);
-		set(12, 0);
-		set(13, 0);
-		set(14, 0);
-		set(15, 1);
-		return this;
+	public VectorBuff3 transform4(VectorBuff3 outset, final VectorBuff3 inset) {
+		for (int k = 0; k < 3; k++)
+			outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2) + get(12 + k));
+		return outset;
 	}
 }

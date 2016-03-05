@@ -24,18 +24,18 @@ public class Matrix34 extends Trans3D<Matrix34> {
 		super(f, offset, 3, 4);
 	}
 
+	public Matrix3 matrix3() {
+		if (m3v == null)
+			m3v = new Matrix3(accessor(), 0);
+		return m3v;
+	}
+
 	@Override
 	public <E extends Vector> E transform(E outset, final Vector inset) {
 		final float inW = inset.dimension() < 4 ? 1 : inset.get(3);
 		for (int k = 0; k < outset.dimension(); k++)
 			outset.set(k,
 					get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2) + get(k, 3) * inW);
-		return outset;
-	}
-
-	public Vector transform3(Vector outset, final Vector inset) {
-		for (int k = 0; k < outset.dimension(); k++)
-			outset.set(k, get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2));
 		return outset;
 	}
 
@@ -47,9 +47,9 @@ public class Matrix34 extends Trans3D<Matrix34> {
 		return in;
 	}
 
-	public Matrix3 matrix3() {
-		if (m3v == null)
-			m3v = new Matrix3(accessor(), 0);
-		return m3v;
+	public Vector transform3(Vector outset, final Vector inset) {
+		for (int k = 0; k < outset.dimension(); k++)
+			outset.set(k, get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2));
+		return outset;
 	}
 }

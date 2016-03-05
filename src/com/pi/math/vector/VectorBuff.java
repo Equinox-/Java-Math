@@ -5,13 +5,25 @@ import java.nio.FloatBuffer;
 import com.pi.math.BufferProvider;
 
 public class VectorBuff extends Vector {
-	protected final FloatBuffer data;
-	private final int dimension;
-
-	public VectorBuff(VectorBuff f, int dim) {
-		this.data = f.data;
-		this.dimension = dim;
+	public static VectorBuff make(FloatBuffer f, int off, int d) {
+		switch (d) {
+		case 4:
+			return new VectorBuff4(f, off);
+		case 3:
+			return new VectorBuff3(f, off);
+		case 2:
+			return new VectorBuff2(f, off);
+		default:
+			return new VectorBuff(f, off, d);
+		}
 	}
+	public static VectorBuff make(int d) {
+		return make(BufferProvider.createFloatBuffer(d), 0, d);
+	}
+
+	protected final FloatBuffer data;
+
+	private final int dimension;
 
 	protected VectorBuff(FloatBuffer data, int offset, int dimension) {
 		this.dimension = dimension;
@@ -24,14 +36,9 @@ public class VectorBuff extends Vector {
 		data.position(ops);
 	}
 
-	@Override
-	public final float get(int d) {
-		return data.get(d);
-	}
-
-	@Override
-	public final void set(int d, float f) {
-		data.put(d, f);
+	public VectorBuff(VectorBuff f, int dim) {
+		this.data = f.data;
+		this.dimension = dim;
 	}
 
 	@Override
@@ -40,11 +47,18 @@ public class VectorBuff extends Vector {
 	}
 
 	@Override
-	public VectorBuff setV(float... v) {
+	public final float get(int d) {
+		return data.get(d);
+	}
+
+	public FloatBuffer getAccessor() {
 		data.position(0);
-		data.put(v);
-		data.position(0);
-		return this;
+		return data;
+	}
+
+	@Override
+	public final void set(int d, float f) {
+		data.put(d, f);
 	}
 
 	public VectorBuff set(VectorBuff v) {
@@ -62,6 +76,14 @@ public class VectorBuff extends Vector {
 	}
 
 	@Override
+	public VectorBuff setV(float... v) {
+		data.position(0);
+		data.put(v);
+		data.position(0);
+		return this;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append('[');
@@ -72,27 +94,5 @@ public class VectorBuff extends Vector {
 		}
 		b.append(']');
 		return b.toString();
-	}
-
-	public FloatBuffer getAccessor() {
-		data.position(0);
-		return data;
-	}
-
-	public static VectorBuff make(int d) {
-		return make(BufferProvider.createFloatBuffer(d), 0, d);
-	}
-
-	public static VectorBuff make(FloatBuffer f, int off, int d) {
-		switch (d) {
-		case 4:
-			return new VectorBuff4(f, off);
-		case 3:
-			return new VectorBuff3(f, off);
-		case 2:
-			return new VectorBuff2(f, off);
-		default:
-			return new VectorBuff(f, off, d);
-		}
 	}
 }

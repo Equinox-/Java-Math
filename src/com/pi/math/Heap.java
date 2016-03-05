@@ -13,34 +13,6 @@ import com.pi.math.vector.VectorBuff3;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class Heap {
-	// 1-4D vectors
-	private static final int[] VECTOR_HEAP_SIZE = new int[4];
-	private static final VectorBuff[][] VECTOR_HEAP = new VectorBuff[4][];
-
-	static {
-		for (int d = 0; d < VECTOR_HEAP.length; d++) {
-			VECTOR_HEAP[d] = new VectorBuff[d + 1 == 3 ? 128 : 16];
-			while (VECTOR_HEAP_SIZE[d] < VECTOR_HEAP[d].length)
-				VECTOR_HEAP[d][VECTOR_HEAP_SIZE[d]++] = VectorBuff.make(d + 1);
-		}
-	}
-
-	// 3D and 4D matrices
-	// 0 -> Matrix4, 1 -> Matrix3
-	private static final int[] MATRIX_HEAP_SIZE = new int[4];
-	private static final Matrix[][] MATRIX_HEAP = new Matrix[4][];
-
-	static {
-		for (int d = 0; d < MATRIX_HEAP.length; d++) {
-			MATRIX_HEAP[d] = new Matrix[8];
-			while (MATRIX_HEAP_SIZE[d] < MATRIX_HEAP[d].length)
-				MATRIX_HEAP[d][MATRIX_HEAP_SIZE[d]++] = makeM(d);
-		}
-	}
-
-	private static final boolean HEAP_WATCH = false;
-	private static final Map<Integer, Data> owner = new HashMap<>();
-
 	private static class Data {
 		private StackTraceElement[] d;
 		private Object o;
@@ -50,25 +22,54 @@ public class Heap {
 			this.d = Thread.currentThread().getStackTrace();
 		}
 	}
+	// 1-4D vectors
+	private static final int[] VECTOR_HEAP_SIZE = new int[4];
 
-	private static void watch(Object o) {
-		owner.put(System.identityHashCode(o), new Data(o));
-	}
+	private static final VectorBuff[][] VECTOR_HEAP = new VectorBuff[4][];
 
-	private static void unwatch(Object o) {
-		owner.remove(System.identityHashCode(o));
-	}
-
-	public static <T extends VectorBuff> T checkout(int dim) {
-		if (dim <= 0 || dim > VECTOR_HEAP.length || VECTOR_HEAP_SIZE[dim - 1] <= 0) {
-			T res = (T) VectorBuff.make(dim);
-			System.out.println("Vector heap miss " + res.getClass().getSimpleName());
-			return res;
+	static {
+		for (int d = 0; d < VECTOR_HEAP.length; d++) {
+			VECTOR_HEAP[d] = new VectorBuff[d + 1 == 3 ? 128 : 16];
+			while (VECTOR_HEAP_SIZE[d] < VECTOR_HEAP[d].length)
+				VECTOR_HEAP[d][VECTOR_HEAP_SIZE[d]++] = VectorBuff.make(d + 1);
 		}
-		T tt = (T) VECTOR_HEAP[dim - 1][--VECTOR_HEAP_SIZE[dim - 1]];
+	}
+	// 3D and 4D matrices
+	// 0 -> Matrix4, 1 -> Matrix3
+	private static final int[] MATRIX_HEAP_SIZE = new int[4];
+
+	private static final Matrix[][] MATRIX_HEAP = new Matrix[4][];
+
+	static {
+		for (int d = 0; d < MATRIX_HEAP.length; d++) {
+			MATRIX_HEAP[d] = new Matrix[8];
+			while (MATRIX_HEAP_SIZE[d] < MATRIX_HEAP[d].length)
+				MATRIX_HEAP[d][MATRIX_HEAP_SIZE[d]++] = makeM(d);
+		}
+	}
+	private static final boolean HEAP_WATCH = false;
+
+	private static final Map<Integer, Data> owner = new HashMap<>();
+
+	public static void checkin(Matrix... vs) {
+		for (Matrix v : vs) {
+			if (v == null)
+				continue;
+			else if (v instanceof Matrix4)
+				checkin(v, 0);
+			else if (v instanceof Matrix3)
+				checkin(v, 1);
+			else if (v instanceof Matrix34)
+				checkin(v, 2);
+		}
+	}
+
+	public static void checkin(Matrix m, int dim) {
+		if (dim < 0 || dim >= MATRIX_HEAP.length || MATRIX_HEAP_SIZE[dim] >= MATRIX_HEAP[dim].length)
+			return;
+		MATRIX_HEAP[dim][MATRIX_HEAP_SIZE[dim]++] = m;
 		if (HEAP_WATCH)
-			watch(tt);
-		return tt;
+			unwatch(m);
 	}
 
 	public static void checkin(VectorBuff... vs) {
@@ -84,21 +85,20 @@ public class Heap {
 		}
 	}
 
-	public static VectorBuff3 checkout3() {
-		return (VectorBuff3) checkout(3);
+	public static <T extends VectorBuff> T checkout(int dim) {
+		if (dim <= 0 || dim > VECTOR_HEAP.length || VECTOR_HEAP_SIZE[dim - 1] <= 0) {
+			T res = (T) VectorBuff.make(dim);
+			System.out.println("Vector heap miss " + res.getClass().getSimpleName());
+			return res;
+		}
+		T tt = (T) VECTOR_HEAP[dim - 1][--VECTOR_HEAP_SIZE[dim - 1]];
+		if (HEAP_WATCH)
+			watch(tt);
+		return tt;
 	}
 
-	private static Matrix makeM(int dim) {
-		switch (dim) {
-		case 0:
-			return new Matrix4();
-		case 1:
-			return new Matrix3();
-		case 2:
-			return new Matrix34();
-		default:
-			return null;
-		}
+	public static VectorBuff3 checkout3() {
+		return (VectorBuff3) checkout(3);
 	}
 
 	public static Matrix checkoutM(int dim) {
@@ -113,18 +113,6 @@ public class Heap {
 		return o;
 	}
 
-	public static void checkin(Matrix m, int dim) {
-		if (dim < 0 || dim >= MATRIX_HEAP.length || MATRIX_HEAP_SIZE[dim] >= MATRIX_HEAP[dim].length)
-			return;
-		MATRIX_HEAP[dim][MATRIX_HEAP_SIZE[dim]++] = m;
-		if (HEAP_WATCH)
-			unwatch(m);
-	}
-
-	public static Matrix4 checkoutM4() {
-		return (Matrix4) checkoutM(0);
-	}
-
 	public static Matrix3 checkoutM3() {
 		return (Matrix3) checkoutM(1);
 	}
@@ -133,16 +121,20 @@ public class Heap {
 		return (Matrix34) checkoutM(2);
 	}
 
-	public static void checkin(Matrix... vs) {
-		for (Matrix v : vs) {
-			if (v == null)
-				continue;
-			else if (v instanceof Matrix4)
-				checkin(v, 0);
-			else if (v instanceof Matrix3)
-				checkin(v, 1);
-			else if (v instanceof Matrix34)
-				checkin(v, 2);
+	public static Matrix4 checkoutM4() {
+		return (Matrix4) checkoutM(0);
+	}
+
+	private static Matrix makeM(int dim) {
+		switch (dim) {
+		case 0:
+			return new Matrix4();
+		case 1:
+			return new Matrix3();
+		case 2:
+			return new Matrix34();
+		default:
+			return null;
 		}
 	}
 
@@ -163,5 +155,13 @@ public class Heap {
 				}
 			}
 		}
+	}
+
+	private static void unwatch(Object o) {
+		owner.remove(System.identityHashCode(o));
+	}
+
+	private static void watch(Object o) {
+		owner.put(System.identityHashCode(o), new Data(o));
 	}
 }

@@ -7,27 +7,12 @@ public class Quaternion {
 			throw new IllegalArgumentException("Quaternion functions only work on 4D vectors");
 	}
 
-	// Output: Roll, pitch, yaw
-	public static Vector toEulerAngles(Vector quat, Vector dest) {
+	public static Vector conjugate(Vector quat) {
 		checkDim(quat);
-		if (dest.dimension() != 3)
-			throw new IllegalArgumentException("Can only decompose a quaternion into a 3D vector.");
-		float q0 = quat.get(0);
-		float q1 = quat.get(1);
-		float q2 = quat.get(2);
-		float q3 = quat.get(3);
-
-		dest.set(0, (float) Math.atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2)));
-		dest.set(1, (float) Math.asin(2 * (q0 * q2 - q3 * q1)));
-		dest.set(2, (float) Math.atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3)));
-		return dest;
-	}
-
-	// Input: Roll, pitch, yaw
-	public static Vector fromEulerAngles(Vector quat, Vector src) {
-		if (src.dimension() != 3)
-			throw new IllegalArgumentException("Can only compose a quaternion from a 3D vector.");
-		return fromEulerAngles(quat, src.get(0), src.get(1), src.get(2));
+		quat.set(0, -quat.get(0));
+		quat.set(1, -quat.get(1));
+		quat.set(2, -quat.get(2));
+		return quat;
 	}
 
 	public static Vector fromEulerAngles(Vector quat, float roll, float pitch, float yaw) {
@@ -49,18 +34,31 @@ public class Quaternion {
 		return quat.normalize();
 	}
 
-	public static Vector conjugate(Vector quat) {
-		checkDim(quat);
-		quat.set(0, -quat.get(0));
-		quat.set(1, -quat.get(1));
-		quat.set(2, -quat.get(2));
-		return quat;
+	// Input: Roll, pitch, yaw
+	public static Vector fromEulerAngles(Vector quat, Vector src) {
+		if (src.dimension() != 3)
+			throw new IllegalArgumentException("Can only compose a quaternion from a 3D vector.");
+		return fromEulerAngles(quat, src.get(0), src.get(1), src.get(2));
 	}
 
 	public static Vector identity(Vector quat) {
 		checkDim(quat);
 		quat.setV(1, 0, 0, 0);
 		return quat;
+	}
+
+	public static <T extends Vector> T mul(T dest, Vector a, Vector b) {
+		checkDim(dest);
+		checkDim(a);
+		checkDim(b);
+		final float aw = a.get(0), ax = a.get(1), ay = a.get(2), az = a.get(3);
+		final float bw = b.get(0), bx = b.get(1), by = b.get(2), bz = b.get(3);
+
+		dest.set(0, aw * bw - ax * bx - ay * by - az * bz);
+		dest.set(1, aw * bx + ax * bw + ay * bz - az * by);
+		dest.set(2, aw * by + ay * bw + az * bx - ax * bz);
+		dest.set(3, aw * bz + az * bw + ax * by - ay * bx);
+		return dest;
 	}
 
 	public static Vector productInto(Vector lhs, Vector rhs) {
@@ -111,17 +109,19 @@ public class Quaternion {
 		return from;
 	}
 
-	public static <T extends Vector> T mul(T dest, Vector a, Vector b) {
-		checkDim(dest);
-		checkDim(a);
-		checkDim(b);
-		final float aw = a.get(0), ax = a.get(1), ay = a.get(2), az = a.get(3);
-		final float bw = b.get(0), bx = b.get(1), by = b.get(2), bz = b.get(3);
+	// Output: Roll, pitch, yaw
+	public static Vector toEulerAngles(Vector quat, Vector dest) {
+		checkDim(quat);
+		if (dest.dimension() != 3)
+			throw new IllegalArgumentException("Can only decompose a quaternion into a 3D vector.");
+		float q0 = quat.get(0);
+		float q1 = quat.get(1);
+		float q2 = quat.get(2);
+		float q3 = quat.get(3);
 
-		dest.set(0, aw * bw - ax * bx - ay * by - az * bz);
-		dest.set(1, aw * bx + ax * bw + ay * bz - az * by);
-		dest.set(2, aw * by + ay * bw + az * bx - ax * bz);
-		dest.set(3, aw * bz + az * bw + ax * by - ay * bx);
+		dest.set(0, (float) Math.atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2)));
+		dest.set(1, (float) Math.asin(2 * (q0 * q2 - q3 * q1)));
+		dest.set(2, (float) Math.atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3)));
 		return dest;
 	}
 }
