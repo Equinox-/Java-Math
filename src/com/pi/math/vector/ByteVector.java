@@ -7,19 +7,19 @@ import com.pi.math.BufferProvider;
 public class ByteVector extends Vector {
 	private static final int RESOLUTION = 0xFF;
 
+	private final ByteBuffer backer;
+	private final int dimension;
+
 	public static ByteVector make(ByteBuffer data, int offset, int dim) {
 		if (dim == 4)
 			return new ByteVector4(data, offset);
 		else
 			return new ByteVector(data, offset, dim);
 	}
+
 	public static ByteVector make(int dim) {
 		return make(BufferProvider.createByteBuffer(dim), 0, dim);
 	}
-
-	private final ByteBuffer backer;
-
-	private final int dimension;
 
 	protected ByteVector(ByteBuffer data, int offset, int dim) {
 		if (offset == 0)

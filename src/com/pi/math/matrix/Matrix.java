@@ -12,6 +12,11 @@ import com.pi.math.vector.VectorBuff;
 public abstract class Matrix<E extends Matrix<?>> {
 	private static final float[] ZERO_CACHE = new float[4 * 4];
 	private static final float[][][] IDENTITY_CACHE = new float[4][4][];
+	protected final int rows, columns;
+
+	protected final FloatBuffer access;
+	protected final VectorBuff[] cols;
+
 	private static FloatBuffer slit(ByteBuffer a, int o, int s) {
 		a.position(o);
 		a.limit(o + s * 4);
@@ -23,6 +28,7 @@ public abstract class Matrix<E extends Matrix<?>> {
 		a.limit(o + s);
 		return a.slice();
 	}
+
 	// Stringification
 	public static String toString(Matrix... show) {
 		StringBuilder res = new StringBuilder();
@@ -58,12 +64,6 @@ public abstract class Matrix<E extends Matrix<?>> {
 		}
 		return res.toString();
 	}
-
-	protected final int rows, columns;
-
-	protected final FloatBuffer access;
-
-	protected final VectorBuff[] cols;
 
 	Matrix(ByteBuffer f, int offset, final int r, final int c) {
 		this(slit(f, offset, r * c), r, c);

@@ -5,6 +5,9 @@ import java.nio.FloatBuffer;
 import com.pi.math.BufferProvider;
 
 public class VectorBuff extends Vector {
+	protected final FloatBuffer data;
+	private final int dimension;
+
 	public static VectorBuff make(FloatBuffer f, int off, int d) {
 		switch (d) {
 		case 4:
@@ -17,13 +20,10 @@ public class VectorBuff extends Vector {
 			return new VectorBuff(f, off, d);
 		}
 	}
+
 	public static VectorBuff make(int d) {
 		return make(BufferProvider.createFloatBuffer(d), 0, d);
 	}
-
-	protected final FloatBuffer data;
-
-	private final int dimension;
 
 	protected VectorBuff(FloatBuffer data, int offset, int dimension) {
 		this.dimension = dimension;
