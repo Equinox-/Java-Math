@@ -66,4 +66,8 @@ public class FastMath {
 	public static float sqrt(float x) {
 		return (float) Math.sqrt(x);
 	}
+	
+	public static float exp(float x) {
+		return (float) Math.exp(x);
+	}
 }
