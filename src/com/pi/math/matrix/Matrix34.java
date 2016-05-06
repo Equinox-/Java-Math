@@ -4,9 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import com.pi.math.BufferProvider;
-import com.pi.math.Heap;
 import com.pi.math.vector.Vector;
-import com.pi.math.vector.VectorBuff;
 
 public class Matrix34 extends Trans3D<Matrix34> {
 	// Matrix3 view. (Changes reflected)
@@ -30,26 +28,42 @@ public class Matrix34 extends Trans3D<Matrix34> {
 		return m3v;
 	}
 
+	// Math operations
 	@Override
-	public <E extends Vector> E transform(E outset, final Vector inset) {
-		final float inW = inset.dimension() < 4 ? 1 : inset.get(3);
-		for (int k = 0; k < outset.dimension(); k++)
-			outset.set(k,
-					get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2) + get(k, 3) * inW);
+	public <E extends Vector> E transform4(E outset, final Vector inset) {
+		for (int k = 0; k < Math.min(3, outset.dimension()); k++)
+			switch (inset.dimension()) {
+			case 1:
+				outset.set(k, get(k, 0) * inset.get(0) + get(k, 3));
+				break;
+			case 2:
+				outset.set(k, get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 3));
+				break;
+			case 3:
+				outset.set(k,
+						get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2) + get(k, 3));
+				break;
+			default:
+				outset.set(k, get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2)
+						+ get(k, 3) * inset.get(3));
+			}
 		return outset;
 	}
 
-	public Vector transform3(Vector in) {
-		VectorBuff out = Heap.checkout(in.dimension());
-		transform3(out, in);
-		in.set(out);
-		Heap.checkin(out);
-		return in;
-	}
-
-	public Vector transform3(Vector outset, final Vector inset) {
-		for (int k = 0; k < outset.dimension(); k++)
-			outset.set(k, get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2));
+	@Override
+	public <E extends Vector> E transform3(E outset, final Vector inset) {
+		for (int k = 0; k < Math.min(3, outset.dimension()); k++)
+			switch (inset.dimension()) {
+			case 1:
+				outset.set(k, get(k) * inset.get(0));
+				break;
+			case 2:
+				outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1));
+				break;
+			default:
+				outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2));
+				break;
+			}
 		return outset;
 	}
 }

@@ -5,7 +5,9 @@ import java.nio.FloatBuffer;
 
 import com.pi.math.BufferProvider;
 import com.pi.math.vector.Vector;
+import com.pi.math.vector.VectorBuff2;
 import com.pi.math.vector.VectorBuff3;
+import com.pi.math.vector.VectorBuff4;
 
 public final class Matrix4 extends Trans3D<Matrix4> {
 	public Matrix4() {
@@ -38,29 +40,40 @@ public final class Matrix4 extends Trans3D<Matrix4> {
 
 	// Math operations
 	@Override
-	public <E extends Vector> E transform(E outset, final Vector inset) {
-		final float inW = inset.dimension() < 4 ? 1 : inset.get(3);
+	public <E extends Vector> E transform4(E outset, final Vector inset) {
 		for (int k = 0; k < outset.dimension(); k++)
-			outset.set(k,
-					get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2) + get(k, 3) * inW);
+			switch (inset.dimension()) {
+			case 1:
+				outset.set(k, get(k, 0) * inset.get(0) + get(k, 3));
+				break;
+			case 2:
+				outset.set(k, get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 3));
+				break;
+			case 3:
+				outset.set(k,
+						get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2) + get(k, 3));
+				break;
+			default:
+				outset.set(k, get(k, 0) * inset.get(0) + get(k, 1) * inset.get(1) + get(k, 2) * inset.get(2)
+						+ get(k, 3) * inset.get(3));
+			}
 		return outset;
 	}
 
-	public Vector transform3(Vector outset, final Vector inset) {
+	@Override
+	public <E extends Vector> E transform3(E outset, final Vector inset) {
 		for (int k = 0; k < outset.dimension(); k++)
-			outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2));
-		return outset;
-	}
-
-	public VectorBuff3 transform3(VectorBuff3 outset, final VectorBuff3 inset) {
-		for (int k = 0; k < 3; k++)
-			outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2));
-		return outset;
-	}
-
-	public VectorBuff3 transform4(VectorBuff3 outset, final VectorBuff3 inset) {
-		for (int k = 0; k < 3; k++)
-			outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2) + get(12 + k));
+			switch (inset.dimension()) {
+			case 1:
+				outset.set(k, get(k) * inset.get(0));
+				break;
+			case 2:
+				outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1));
+				break;
+			default:
+				outset.set(k, get(k) * inset.get(0) + get(4 + k) * inset.get(1) + get(8 + k) * inset.get(2));
+				break;
+			}
 		return outset;
 	}
 }

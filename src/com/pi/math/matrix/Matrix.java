@@ -317,15 +317,25 @@ public abstract class Matrix<E extends Matrix<?>> {
 		return toString(this);
 	}
 
-	public <R extends Vector> R transform(final R input) {
+	public <R extends Vector> R transform4(final R input) {
 		VectorBuff tmp = Heap.checkout(input.dimension());
-		transform(tmp, input);
+		transform4(tmp, input);
 		input.set(tmp);
 		Heap.checkin(tmp);
 		return input;
 	}
 
-	public abstract <R extends Vector> R transform(final R output, Vector input);
+	public abstract <R extends Vector> R transform4(final R output, Vector input);
+
+	public <R extends Vector> R transform3(final R input) {
+		VectorBuff tmp = Heap.checkout(input.dimension());
+		transform4(tmp, input);
+		input.set(tmp);
+		Heap.checkin(tmp);
+		return input;
+	}
+
+	public abstract <R extends Vector> R transform3(final R output, Vector input);
 
 	public final E transposeInPlace() {
 		for (int r = 1; r < rows; r++) {

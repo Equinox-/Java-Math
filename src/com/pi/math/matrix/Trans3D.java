@@ -173,7 +173,7 @@ public abstract class Trans3D<E extends Trans3D<?>> extends Matrix<E> {
 
 		VectorBuff3 tmp = null;
 		if (rhs.columns > 3)
-			tmp = (VectorBuff3) lhs.transform(Heap.checkout3(), rhs.column(3));
+			tmp = (VectorBuff3) lhs.transform4(Heap.checkout3(), rhs.column(3));
 		else if (lhs.columns > 3)
 			tmp = Heap.checkout3().set(lhs.column(3));
 
